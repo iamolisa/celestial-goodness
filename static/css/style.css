@@ -1,0 +1,296 @@
+/* ============================================================
+   Celestial Goodness Astrology & Tarot — Custom Styles
+   Tailwind CDN handles utility classes; this file handles:
+   - CSS custom properties (design tokens)
+   - Custom utility classes not in Tailwind
+   - Animations & keyframes
+   - Star-field background
+   - Gradient helpers
+   - Toast notification
+   ============================================================ */
+
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ── Design Tokens ── */
+:root {
+  --bg:            #0e0f1a;
+  --bg-card:       #13162b;
+  --border:        #202440;
+  --fg:            #e8e2d5;
+  --muted:         #727ab8;
+  --primary:       #c9922a;
+  --primary-light: #d4ac55;
+  --primary-dark:  #a06b10;
+  --celestial:     #6e4d99;
+  --celestial-light: #9b7abf;
+  --success:       #2fb37f;
+  --destructive:   #e74c3c;
+
+  --gradient-gold:     linear-gradient(135deg, #c9922a, #c06420, #d4ac55);
+  --gradient-hero:     linear-gradient(180deg, #0e0f1a 0%, #1a1030 50%, #0e0f1a 100%);
+  --gradient-celestial:linear-gradient(135deg, #2a1a40, #0e0f1a, #0d1e2a);
+
+  --shadow-gold: 0 4px 30px rgba(201, 146, 42, 0.20);
+  --shadow-card: 0 8px 40px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 20px rgba(201, 146, 42, 0.30), 0 0 60px rgba(201, 146, 42, 0.10);
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --radius: 0.75rem;
+}
+
+/* ── Base Reset ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
+
+/* ── Typography Helpers ── */
+.font-display { font-family: var(--font-display); }
+.font-body    { font-family: var(--font-body); }
+
+.text-gradient-gold {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Background Helpers ── */
+.bg-gradient-gold     { background: var(--gradient-gold); }
+.bg-gradient-hero     { background: var(--gradient-hero); }
+.bg-gradient-celestial{ background: var(--gradient-celestial); }
+
+/* ── Shadow Helpers ── */
+.shadow-gold { box-shadow: var(--shadow-gold); }
+.shadow-card { box-shadow: var(--shadow-card); }
+.shadow-glow { box-shadow: var(--shadow-glow); }
+
+/* ── Star Field ── */
+.star-field {
+  background-image:
+    radial-gradient(2px 2px at 20px  30px, rgba(255, 244, 179, 0.60), transparent),
+    radial-gradient(2px 2px at 40px  70px, rgba(255, 244, 179, 0.40), transparent),
+    radial-gradient(1px 1px at 90px  40px, rgba(255, 244, 179, 0.50), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255, 244, 179, 0.30), transparent),
+    radial-gradient(2px 2px at 160px 30px, rgba(255, 244, 179, 0.50), transparent),
+    radial-gradient(1px 1px at 200px 60px, rgba(255, 244, 179, 0.40), transparent);
+  background-size: 240px 100px;
+  background-repeat: repeat;
+}
+
+/* ── Glow on Hover ── */
+.glow-gold { box-shadow: var(--shadow-glow); }
+
+/* ── Animations ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 1; }
+}
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-float      { animation: float      6s ease-in-out infinite; }
+.animate-twinkle    { animation: twinkle    3s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulseGlow  2s ease-in-out infinite; }
+.animate-fade-in-up { animation: fadeInUp   0.6s ease both; }
+.animate-fade-in    { animation: fadeIn     0.4s ease both; }
+.animate-scale-in   { animation: scaleIn    0.4s cubic-bezier(.34,1.56,.64,1) both; }
+
+/* ── Form Input Base ── */
+.input-base {
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(19, 22, 43, 0.8);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--fg);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-base::placeholder { color: var(--muted); }
+.input-base:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+/* ── Buttons ── */
+.btn-gold {
+  display: inline-block;
+  background: var(--gradient-gold);
+  color: var(--bg);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius);
+  padding: 0.875rem 1.5rem;
+  box-shadow: var(--shadow-gold);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.btn-gold:hover    { transform: scale(1.02); }
+.btn-gold:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-outline {
+  display: inline-block;
+  background: transparent;
+  color: var(--primary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius);
+  padding: 0.5rem 1.25rem;
+  border: 1px solid rgba(201, 146, 42, 0.5);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-outline:hover {
+  background: var(--primary);
+  color: var(--bg);
+}
+
+/* ── Card ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 2);
+  box-shadow: var(--shadow-card);
+}
+
+/* ── Service Card Hover Glow ── */
+.service-card {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.service-card:hover {
+  border-color: rgba(201, 146, 42, 0.3);
+  box-shadow: var(--shadow-gold);
+}
+.service-card .hover-circle {
+  pointer-events: none;
+  position: absolute;
+  right: -2.5rem;
+  top: -2.5rem;
+  width: 8rem;
+  height: 8rem;
+  border-radius: 9999px;
+  background: rgba(201, 146, 42, 0.05);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.service-card:hover .hover-circle { opacity: 1; }
+
+/* ── Badge Pills ── */
+.badge {
+  display: inline-block;
+  border-radius: 9999px;
+  padding: 0.25rem 0.625rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+.badge-paid      { background: rgba(47, 179, 127, 0.15); color: #2fb37f; }
+.badge-pending   { background: rgba(201, 146, 42, 0.15); color: #c9922a; }
+.badge-failed    { background: rgba(231, 76,  60, 0.15); color: #e74c3c; }
+.badge-upcoming  { background: rgba(110, 77, 153, 0.20); color: #9b7abf; }
+.badge-completed { background: rgba(47, 179, 127, 0.15); color: #2fb37f; }
+.badge-cancelled { background: rgba(231, 76,  60, 0.15); color: #e74c3c; }
+
+/* ── Section Heading Label ── */
+.section-label {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+}
+
+/* ── Toast ── */
+#toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-family: var(--font-body);
+  background: var(--bg-card);
+  border: 1px solid var(--primary);
+  color: var(--fg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+#toast.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+#toast.error { border-color: var(--destructive); }
+
+/* ── Navbar ── */
+#navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  border-bottom: 1px solid rgba(32, 36, 64, 0.6);
+  background: rgba(14, 15, 26, 0.80);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ── Mobile Menu Transition ── */
+#mobileMenu {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+}
+#mobileMenu.open { max-height: 400px; }
+
+/* ── Scrollbar (Webkit) ── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }

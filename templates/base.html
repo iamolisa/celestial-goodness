@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Celestial Goodness Astrology & Tarot{% endblock %}</title>
+
+  <!-- Tailwind CDN (utility classes) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body:    ['"DM Sans"', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom styles: tokens, animations, star-field, badges, etc. -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="min-h-screen">
+
+{% block nav %}
+<nav id="navbar">
+  <div class="max-w-6xl mx-auto px-4 flex h-16 md:h-20 items-center justify-between">
+    <a href="/" class="flex items-center gap-2">
+      <svg class="w-6 h-6" style="color:var(--primary)" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+      </svg>
+      <span class="font-display text-xl font-bold" style="color:var(--primary)">Celestial Goodness</span>
+    </a>
+
+    <div class="hidden md:flex items-center gap-8">
+      {% set cur = request.path %}
+      {% for label, path in [('Home','/'),('About','/about'),('Services','/services'),('Book Now','/booking'),('Contact','/contact')] %}
+        <a href="{{ path }}" class="font-body text-sm tracking-wide transition-colors hover:text-[#c9922a]"
+           style="color:{{ 'var(--primary)' if cur == path else 'var(--muted)' }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+
+    <button id="menuBtn" aria-label="Toggle menu" style="color:var(--fg); background:none; border:none; cursor:pointer;">
+      <svg id="iconMenu" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <svg id="iconClose" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div id="mobileMenu" aria-hidden="true" style="background:var(--bg); border-bottom:1px solid var(--border);">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col gap-4">
+      {% for label, path in [('Home','/'),('About','/about'),('Services','/services'),('Book Now','/booking'),('Contact','/contact')] %}
+        <a href="{{ path }}" class="font-body text-lg transition-colors hover:text-[#c9922a]"
+           style="color:{{ 'var(--primary)' if request.path == path else 'var(--muted)' }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+{% block body %}{% endblock %}
+
+{% block footer %}
+<footer style="border-top:1px solid var(--border); background:rgba(19,22,43,0.5);">
+  <div class="max-w-6xl mx-auto px-4 py-16">
+    <div class="grid gap-12 md:grid-cols-3">
+      <div>
+        <div class="mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5" style="color:var(--primary)" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+          </svg>
+          <span class="font-display text-lg font-bold" style="color:var(--primary)">Celestial Goodness</span>
+        </div>
+        <p class="font-body text-sm leading-relaxed" style="color:var(--muted)">Sacred guidance through astrology and tarot for those navigating transformation. Helping you reclaim your sovereignty and move with celestial wisdom.</p>
+      </div>
+      <div>
+        <h4 class="mb-4 font-display text-sm font-semibold uppercase tracking-widest" style="color:var(--primary)">Navigate</h4>
+        <div class="flex flex-col gap-2">
+          {% for label, path in [('Home','/'),('About','/about'),('Services','/services'),('Book a Reading','/booking'),('Blog','/blog'),('Testimonials','/testimonials'),('Ethics & Disclaimer','/ethics'),('Contact','/contact')] %}
+            <a href="{{ path }}" class="font-body text-sm transition-colors hover:text-[#c9922a]" style="color:var(--muted)">{{ label }}</a>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <h4 class="mb-4 font-display text-sm font-semibold uppercase tracking-widest" style="color:var(--primary)">Connect</h4>
+        <div class="flex gap-4">
+          <a href="#" class="transition-colors hover:text-[#c9922a]" style="color:var(--muted)" aria-label="Instagram">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="currentColor"/></svg>
+          </a>
+          <!-- YouTube — link to be updated with Heather's channel URL -->
+          <a href="#" class="transition-colors hover:text-[#c9922a]" style="color:var(--muted)" aria-label="YouTube">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="/cdn-cgi/l/email-protection#90f8f5fcfcffd0f3f5fcf5e3e4f9f1fcf7fffff4fef5e3e3f1e3e4e2fffcfff7e9bef3fffd" class="transition-colors hover:text-[#c9922a]" style="color:var(--muted)" aria-label="Email">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="mt-12 pt-8 text-center" style="border-top:1px solid var(--border)">
+      <p class="font-body text-xs" style="color:var(--muted)">© <span id="yr"></span> Celestial Goodness Astrology &amp; Tarot. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+{% endblock %}
+
+<!-- Toast (styled in style.css) -->
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- Shared JS: navbar, toast, scroll reveals, api helper -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

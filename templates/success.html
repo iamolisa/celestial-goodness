@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Booking Confirmed — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block body %}
+
+<section class="flex min-h-[80vh] items-center justify-center bg-gradient-hero star-field py-20">
+  <div class="max-w-lg mx-auto px-4 w-full">
+    <div class="rounded-2xl border border-[#c9922a]/20 bg-[#13162b] p-10 shadow-glow animate-fade-in-up">
+
+      <!-- Check icon -->
+      <div class="mx-auto mb-5 w-16 h-16 rounded-full bg-[#2fb37f]/20 flex items-center justify-center">
+        <svg class="w-8 h-8" style="color:#2fb37f" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+
+      <h1 class="mb-2 text-center font-display text-3xl font-bold" style="color:var(--fg)">Booking Confirmed ✨</h1>
+      <p class="mb-6 text-center font-body text-sm leading-relaxed" style="color:var(--muted)">
+        The stars have aligned for your session. A confirmation email is on its way.
+      </p>
+
+      <!-- Booking summary card -->
+      {% if booking %}
+      <div class="rounded-xl p-5 mb-6 space-y-3" style="background:rgba(110,77,153,0.08);border:1px solid rgba(110,77,153,0.2);">
+        <p class="font-display text-xs font-semibold uppercase tracking-widest mb-1" style="color:var(--primary)">Your Session Details</p>
+
+        {% set rows = [
+          ('Booking ID',  booking.id),
+          ('Session',     booking.serviceName),
+          ('Name',        booking.clientName),
+          ('Date',        booking.date),
+          ('Time',        booking.time),
+          ('Format',      'Zoom' if booking.format == 'zoom' else 'Phone'),
+          ('Total',       '$' ~ '%.2f'|format(booking.price)),
+          ('Payment',     booking.paymentStatus | capitalize),
+        ] %}
+        {% for label, value in rows %}
+        <div class="flex justify-between gap-4 text-sm" style="border-bottom:1px solid rgba(32,36,64,.4);padding-bottom:.6rem;">
+          <span class="font-body" style="color:var(--muted);min-width:100px">{{ label }}</span>
+          <span class="font-body font-medium text-right flex-1" style="color:var(--fg)">{{ value }}</span>
+        </div>
+        {% endfor %}
+
+        {% if booking.birthDate %}
+        <div class="flex justify-between gap-4 text-sm" style="border-bottom:1px solid rgba(32,36,64,.4);padding-bottom:.6rem;">
+          <span class="font-body" style="color:var(--muted);min-width:100px">Date of Birth</span>
+          <span class="font-body font-medium text-right flex-1" style="color:var(--fg)">{{ booking.birthDate }}</span>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Policy reminder -->
+      <div class="rounded-lg p-4 mb-6 text-xs" style="background:rgba(201,146,42,0.06);border:1px solid rgba(201,146,42,0.15);">
+        <p style="color:var(--muted);line-height:1.6;">
+          ✦ <strong style="color:var(--fg)">Cancellation Policy:</strong>
+          24-hour notice required to reschedule. One reschedule allowed per booking.
+          Missed appointments are non-refundable.
+        </p>
+      </div>
+
+      <!-- Quote -->
+      <div class="text-3xl text-center mb-4 animate-pulse-glow">✦</div>
+      <p class="mb-8 text-center font-body text-sm italic" style="color:var(--muted)">
+        "Trust the timing of your life. Everything is unfolding exactly as it should."
+      </p>
+
+      <!-- Actions -->
+      <div class="flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <a href="/" class="rounded-lg border px-6 py-3 font-body text-sm font-medium text-center transition-colors"
+           style="border-color:var(--border);color:var(--fg);"
+           onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+           onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--fg)'">
+          Return Home
+        </a>
+        <a href="/services" class="rounded-lg px-6 py-3 font-body text-sm font-semibold text-center transition-transform hover:scale-105"
+           style="background:linear-gradient(135deg,#c9922a,#e8b84b);color:#0e0f1a;">
+          Explore More Services
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

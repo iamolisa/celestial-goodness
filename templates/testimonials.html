@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Testimonials — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block body %}
+
+<section class="bg-gradient-hero star-field pb-24 pt-32">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <span class="mb-3 inline-block font-body text-xs font-semibold uppercase tracking-[.3em]" style="color:var(--primary);">&#10022; Client Experiences &#10022;</span>
+    <h1 class="font-display text-5xl font-bold" style="color:var(--fg);">Words from Awakened Souls</h1>
+    <p class="mt-4 font-body text-base max-w-xl mx-auto" style="color:var(--muted);">Hear from those who have sat with Heather in sacred session.</p>
+  </div>
+</section>
+
+<section class="py-24">
+  <div class="max-w-6xl mx-auto px-4">
+    {% if testimonials %}
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {% for t in testimonials %}
+      <div class="card p-8 flex flex-col js-reveal">
+        <div class="mb-4 flex gap-1">{% for _ in range(t.rating) %}<span style="color:var(--primary);">&#9733;</span>{% endfor %}</div>
+        <p class="mb-5 font-body text-base italic leading-relaxed flex-1" style="color:var(--muted);">&ldquo;{{ t.text }}&rdquo;</p>
+        <div class="pt-4" style="border-top:1px solid var(--border);">
+          <p class="font-display text-sm font-semibold" style="color:var(--fg);">&#8212; {{ t.name }}</p>
+          {% if t.service %}<p class="font-body text-xs mt-1" style="color:var(--muted);">{{ t.service }}</p>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 js-reveal">
+      <div class="text-5xl mb-6">&#127769;</div>
+      <p class="font-display text-2xl font-bold mb-3" style="color:var(--fg);">Testimonials coming soon.</p>
+      <p class="font-body text-base mb-8" style="color:var(--muted);">Heather is gathering words from recent clients. Check back before long.</p>
+      <a href="/booking" class="btn-gold px-8 py-3">Be Among the First to Book</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="py-16 text-center" style="border-top:1px solid var(--border); background:rgba(19,22,43,0.3);">
+  <div class="max-w-xl mx-auto px-4 js-reveal">
+    <p class="font-display text-2xl font-bold mb-3" style="color:var(--fg);">Had a session with Heather?</p>
+    <p class="font-body text-sm mb-8" style="color:var(--muted);">Your words help others find their way to this sacred space. Share your experience below.</p>
+    <div id="testimonyFormWrap">
+      <div class="card p-8 text-left space-y-5">
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg);">Your Name</label>
+          <input type="text" id="tName" placeholder="First name or initials" class="input-base" />
+        </div>
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg);">Session <span style="color:var(--muted);">(optional)</span></label>
+          <input type="text" id="tService" placeholder="e.g. The Celestial Blueprint Consultation" class="input-base" />
+        </div>
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg);">Your Experience</label>
+          <textarea id="tText" rows="4" placeholder="Share what your session meant to you..." class="input-base"></textarea>
+        </div>
+        <div>
+          <label class="mb-2 block font-body text-sm font-medium" style="color:var(--fg);">Rating</label>
+          <div class="flex gap-2" id="starRating">
+            {% for i in [1,2,3,4,5] %}
+            <button type="button" data-val="{{ i }}" class="star-btn text-2xl transition-colors" style="background:none;border:none;cursor:pointer;color:var(--border);">&#9733;</button>
+            {% endfor %}
+          </div>
+          <input type="hidden" id="tRating" value="0" />
+        </div>
+        <button id="tSubmitBtn" class="btn-gold w-full py-3">Submit Testimonial</button>
+        <p class="font-body text-xs text-center" style="color:var(--muted);">Testimonials are reviewed by Heather before appearing on the site.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block scripts %}
+<script>
+  let selectedRating = 0;
+  document.getElementById('starRating').addEventListener('click', e => {
+    const btn = e.target.closest('.star-btn');
+    if (!btn) return;
+    selectedRating = parseInt(btn.dataset.val);
+    document.getElementById('tRating').value = selectedRating;
+    document.querySelectorAll('.star-btn').forEach((b, i) => {
+      b.style.color = i < selectedRating ? 'var(--primary)' : 'var(--border)';
+    });
+  });
+  document.getElementById('tSubmitBtn').addEventListener('click', async () => {
+    const name    = document.getElementById('tName').value.trim();
+    const text    = document.getElementById('tText').value.trim();
+    const rating  = parseInt(document.getElementById('tRating').value);
+    const service = document.getElementById('tService').value.trim();
+    if (!name || !text || !rating) { showToast('Please fill in your name, experience, and a star rating.', 'error'); return; }
+    const btn = document.getElementById('tSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Submitting...';
+    const { ok } = await api.post('/api/testimonial', { name, text, rating, service });
+    if (ok) {
+      document.getElementById('testimonyFormWrap').innerHTML =
+        '<div class="card p-8 text-center">' +
+        '<div class="text-4xl mb-4">&#10022;</div>' +
+        '<p class="font-display text-xl font-semibold mb-2" style="color:var(--fg);">Thank you, beautiful soul.</p>' +
+        '<p class="font-body text-sm" style="color:var(--muted);">Your words have been received. Heather will review and approve them shortly.</p>' +
+        '</div>';
+    } else {
+      showToast('Something went wrong. Please try again.', 'error');
+      btn.disabled = false; btn.textContent = 'Submit Testimonial';
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Contact Heather -- Celestial Goodness Astrology and Tarot{% endblock %}
+{% block body %}
+<section class="bg-gradient-hero star-field pb-16 pt-32">
+  <div class="max-w-4xl mx-auto px-4 text-center">
+    <span class="section-label">Get in Touch</span>
+    <h1 class="font-display text-5xl font-bold" style="color:var(--fg)">Contact Heather</h1>
+    <p class="mt-4 font-body text-base max-w-lg mx-auto" style="color:var(--muted)">Have a question about a session, or not sure which reading is right for you? Reach out -- Heather will get back to you within 24 hours.</p>
+  </div>
+</section>
+<section class="py-20">
+  <div class="max-w-5xl mx-auto px-4 grid gap-16 md:grid-cols-[1fr_2fr] items-start">
+    <div class="space-y-8 pt-2">
+      <div class="flex items-start gap-4 js-reveal">
+        <span class="mt-1 text-xl" style="color:var(--primary);">&#10022;</span>
+        <div>
+          <h3 class="mb-1 font-display text-base font-semibold" style="color:var(--fg)">Email</h3>
+          <a href="mailto:hello@celestialgoodnessastrology.com" class="font-body text-sm transition-colors hover:text-[#d4ac55]" style="color:var(--primary);">hello@celestialgoodnessastrology.com</a>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 js-reveal">
+        <span class="mt-1 text-xl">&#127769;</span>
+        <div>
+          <h3 class="mb-1 font-display text-base font-semibold" style="color:var(--fg)">Sessions</h3>
+          <p class="font-body text-sm" style="color:var(--muted)">All sessions held via <strong style="color:var(--fg)">Zoom</strong> (primary).<br>Phone available upon request.<br>No in-person sessions at this time.</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 js-reveal">
+        <span class="mt-1 text-xl">&#9733;</span>
+        <div>
+          <h3 class="mb-1 font-display text-base font-semibold" style="color:var(--fg)">Response Time</h3>
+          <p class="font-body text-sm" style="color:var(--muted)">Within 24 hours, Monday through Friday.</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 js-reveal">
+        <span class="mt-1 text-xl">&#10022;</span>
+        <div>
+          <h3 class="mb-1 font-display text-base font-semibold" style="color:var(--fg)">Ready to Book?</h3>
+          <p class="font-body text-sm mb-3" style="color:var(--muted)">If you already know which session you would like, you can book directly without reaching out first.</p>
+          <a href="/booking" class="btn-gold px-6 py-2.5 text-sm">Book a Reading</a>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 js-reveal">
+        <span class="mt-1 text-xl">&#10022;</span>
+        <div>
+          <h3 class="mb-3 font-display text-base font-semibold" style="color:var(--fg)">Connect</h3>
+          <div class="flex gap-4">
+            <a href="#" style="color:var(--muted);" class="transition-colors hover:text-[#c9922a]" aria-label="Instagram"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="currentColor"/></svg></a>
+            <a href="#" style="color:var(--muted);" class="transition-colors hover:text-[#c9922a]" aria-label="YouTube"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="formWrap" class="js-reveal">
+      <div class="card p-8 space-y-5 animate-fade-in-up">
+        <div>
+          <h2 class="font-display text-2xl font-bold mb-1" style="color:var(--fg)">Send a Message</h2>
+          <p class="font-body text-sm" style="color:var(--muted)">Not sure which session is right for you? Ask away.</p>
+        </div>
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Your Name</label>
+          <input type="text" id="cName" required placeholder="Your name" class="input-base" />
+        </div>
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Email</label>
+          <input type="email" id="cEmail" required placeholder="you@example.com" class="input-base" />
+        </div>
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Subject <span style="color:var(--muted);">(optional)</span></label>
+          <select id="cSubject" class="input-base">
+            <option value="">Select a topic...</option>
+            <option>Question about a session</option>
+            <option>Not sure which session to book</option>
+            <option>Question about astrology or tarot</option>
+            <option>Booking or payment issue</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Message</label>
+          <textarea id="cMessage" required rows="5" placeholder="What would you like to know?" class="input-base"></textarea>
+        </div>
+        <button id="cSubmitBtn" class="btn-gold w-full py-3.5">Send Message</button>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById("cSubmitBtn").addEventListener("click", async () => {
+    const name = document.getElementById("cName").value.trim();
+    const email = document.getElementById("cEmail").value.trim();
+    const message = document.getElementById("cMessage").value.trim();
+    const subject = document.getElementById("cSubject").value;
+    if (!name || !email || !message) { showToast("Please fill in your name, email, and message.", "error"); return; }
+    const btn = document.getElementById("cSubmitBtn");
+    btn.disabled = true; btn.textContent = "Sending...";
+    const { ok, data } = await api.post("/api/contact", { name, email, message, subject });
+    if (ok) {
+      document.getElementById("formWrap").innerHTML = "<div class="card p-8 text-center"><div class="text-4xl mb-4">&#10022;</div><p class="font-display text-xl font-semibold mb-2" style="color:var(--fg);">Message received.</p><p class="font-body text-sm" style="color:var(--muted);">Heather will be in touch within 24 hours. Thank you.</p></div>";
+    } else {
+      showToast((data && data.error) || "Something went wrong. Please try again.", "error");
+      btn.disabled = false; btn.textContent = "Send Message";
+    }
+  });
+</script>
+{% endblock %}

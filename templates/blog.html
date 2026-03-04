@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Celestial Insights — Blog — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block body %}
+
+<!-- HERO -->
+<section class="bg-gradient-hero star-field pb-20 pt-32">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <span class="mb-3 inline-block font-body text-xs font-semibold uppercase tracking-[.3em]" style="color:var(--primary)">✦ Written by Heather ✦</span>
+    <h1 class="font-display text-5xl font-bold" style="color:var(--fg)">Celestial Insights</h1>
+    <p class="mt-4 font-body text-base max-w-xl mx-auto" style="color:var(--muted)">
+      Astrology, tarot, and the sacred wisdom that shapes our inner world. Writings to illuminate your path.
+    </p>
+  </div>
+</section>
+
+<!-- CATEGORY FILTER -->
+<section class="py-8" style="border-bottom:1px solid var(--border);">
+  <div class="max-w-6xl mx-auto px-4 flex flex-wrap gap-3 justify-center">
+    <a href="/blog"
+       class="font-body text-xs font-semibold uppercase tracking-widest px-4 py-2 rounded-full transition-all"
+       style="{{ 'background:var(--primary);color:#0e0f1a;' if not active_category else 'border:1px solid var(--border);color:var(--muted);' }}">
+      All Posts
+    </a>
+    {% for cat in categories %}
+    <a href="/blog?category={{ cat }}"
+       class="font-body text-xs font-semibold uppercase tracking-widest px-4 py-2 rounded-full transition-all"
+       style="{{ 'background:var(--primary);color:#0e0f1a;' if active_category == cat else 'border:1px solid var(--border);color:var(--muted);' }}">
+      {{ cat }}
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- POSTS GRID -->
+<section class="py-20">
+  <div class="max-w-6xl mx-auto px-4">
+    {% if posts %}
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {% for post in posts %}
+      <article class="group card p-6 flex flex-col js-reveal" style="transition:border-color .3s;">
+        <div class="mb-3">
+          <span class="font-body text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full"
+                style="background:rgba(201,146,42,0.1); color:var(--primary);">{{ post.category }}</span>
+        </div>
+        <h2 class="mb-3 font-display text-xl font-bold leading-snug group-hover:text-[#d4ac55] transition-colors"
+            style="color:var(--fg);">
+          <a href="/blog/{{ post.id }}">{{ post.title }}</a>
+        </h2>
+        <p class="mb-5 font-body text-sm leading-relaxed flex-1" style="color:var(--muted);">{{ post.excerpt }}</p>
+        <div class="flex items-center justify-between mt-auto pt-4" style="border-top:1px solid var(--border);">
+          <span class="font-body text-xs" style="color:var(--muted);">{{ post.createdAt }}</span>
+          <a href="/blog/{{ post.id }}"
+             class="font-body text-xs font-medium transition-colors hover:text-[#d4ac55]"
+             style="color:var(--primary);">Read More →</a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 js-reveal">
+      <div class="text-5xl mb-4">✦</div>
+      <p class="font-display text-2xl font-bold mb-2" style="color:var(--fg);">New writings are coming.</p>
+      <p class="font-body text-base" style="color:var(--muted);">Heather is preparing her first celestial insights. Check back soon.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-16 text-center" style="border-top:1px solid var(--border); background:rgba(19,22,43,0.3);">
+  <div class="max-w-lg mx-auto px-4 js-reveal">
+    <p class="font-display text-2xl font-bold mb-4" style="color:var(--fg);">Ready for a private reading?</p>
+    <p class="font-body text-sm mb-6" style="color:var(--muted);">Words can illuminate — a session goes deeper. Book your sacred one-on-one with Heather.</p>
+    <a href="/booking" class="btn-gold px-8 py-3">Book Your Private Reading</a>
+  </div>
+</section>
+
+{% endblock %}

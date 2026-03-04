@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Services — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block body %}
+
+<section class="bg-gradient-hero star-field pb-24 pt-32">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <span class="mb-3 inline-block font-body text-xs font-semibold uppercase tracking-[.3em] text-[#c9922a]">Our Offerings</span>
+    <h1 class="font-display text-5xl font-bold text-[#e8e2d5]">Sacred Services</h1>
+    <p class="mt-4 font-body text-base text-[#727ab8] max-w-2xl mx-auto">Explore our full range of spiritual services designed to illuminate your path and heal your soul.</p>
+  </div>
+</section>
+
+<section class="py-24">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {% for s in services %}
+      <div class="group relative overflow-hidden rounded-2xl border border-[#202440] bg-[#13162b] p-6 transition-all duration-300 hover:border-[#c9922a]/30 hover:shadow-gold">
+        <div class="mb-4 text-4xl">{{ s.icon }}</div>
+        <h3 class="mb-2 font-display text-xl font-semibold text-[#e8e2d5]">{{ s.title }}</h3>
+        <p class="mb-4 font-body text-sm leading-relaxed text-[#727ab8]">{{ s.description }}</p>
+        <div class="mb-6 flex items-center gap-4 text-sm text-[#727ab8]">
+          <span>⏱ {{ s.duration }}</span>
+          <span>💰 ${{ s.price }}</span>
+        </div>
+        <a href="/booking?service={{ s.id }}" class="inline-block rounded-lg border border-[#c9922a]/50 px-5 py-2 font-body text-sm font-medium text-[#c9922a] transition-all hover:bg-[#c9922a] hover:text-[#0e0f1a]">Book Now</a>
+        <div class="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#c9922a]/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

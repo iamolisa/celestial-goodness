@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% block title %}Book a Session — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block body %}
+
+<section class="bg-gradient-hero star-field pb-12 pt-32">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <span class="section-label">Reserve Your Session</span>
+    <h1 class="font-display text-5xl font-bold" style="color:var(--fg)">Book Your Private Reading</h1>
+    <p class="mt-4 font-body text-base" style="color:var(--muted)">All sessions are conducted via Zoom. Full payment is required at the time of booking.</p>
+  </div>
+</section>
+
+<!-- Step indicator -->
+<div class="max-w-lg mx-auto px-4 pt-10 pb-2">
+  <div class="flex items-center gap-0">
+    <div class="flex items-center gap-2">
+      <div id="step1dot" class="w-8 h-8 rounded-full flex items-center justify-center font-display text-sm font-bold transition-all" style="background:var(--primary);color:#0e0f1a;">1</div>
+      <span class="font-body text-sm font-medium" style="color:var(--primary)">Your Details</span>
+    </div>
+    <div class="flex-1 mx-3 h-px" style="background:var(--border)"></div>
+    <div class="flex items-center gap-2">
+      <div id="step2dot" class="w-8 h-8 rounded-full flex items-center justify-center font-display text-sm font-bold transition-all" style="background:var(--border);color:var(--muted);">2</div>
+      <span id="step2label" class="font-body text-sm" style="color:var(--muted)">Review & Confirm</span>
+    </div>
+  </div>
+</div>
+
+<section class="py-10">
+  <div class="max-w-lg mx-auto px-4">
+
+    <!-- STEP 1: Form -->
+    <div id="formStep">
+      <form id="bookingForm" class="card p-8 space-y-5 animate-fade-in-up">
+
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Full Name</label>
+          <input type="text" name="name" required placeholder="Your full name" class="input-base" />
+        </div>
+
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Email</label>
+          <input type="email" name="email" required placeholder="you@example.com" class="input-base" />
+        </div>
+
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Service</label>
+          <select name="serviceId" required class="input-base" id="serviceSelect">
+            <option value="">Select a service</option>
+            {% for s in services %}
+            <option value="{{ s.id }}"
+                    data-requires-birth="{{ 'true' if s.requires_birth_info else 'false' }}"
+                    data-price="{{ '%.2f' % s.price }}"
+                    data-duration="{{ s.duration }}"
+                    {% if preselected == s.id %}selected{% endif %}>
+              {{ s.title }} — ${{ '%.2f' % s.price }} ({{ s.duration }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Birth info — only shown for astrology sessions -->
+        <div id="birthInfoSection" style="display:none;" class="space-y-4">
+          <div class="rounded-lg p-3" style="background:rgba(100,80,180,0.08); border:1px solid rgba(100,80,180,0.2);">
+            <p class="font-body text-xs leading-relaxed" style="color:var(--muted)">
+              ✦ This session uses your natal chart. Please provide your birth details as accurately as possible. If your exact birth time is unknown, Heather will cast an Aries Rising chart using your birth date and location.
+            </p>
+          </div>
+          <div>
+            <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Date of Birth <span style="color:#e74c3c">*</span></label>
+            <input type="date" name="birthDate" id="birthDate" class="input-base" />
+          </div>
+          <div>
+            <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">
+              Exact Birth Time <span class="font-normal" style="color:var(--muted)">(if known)</span>
+            </label>
+            <input type="time" name="birthTime" class="input-base" />
+          </div>
+          <div>
+            <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">
+              Birth Location <span class="font-normal" style="color:var(--muted)">(City, State/Country)</span>
+            </label>
+            <input type="text" name="birthLocation" placeholder="e.g. Atlanta, Georgia, USA" class="input-base" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Preferred Date</label>
+            <input type="date" name="date" required id="dateInput" class="input-base" />
+          </div>
+          <div>
+            <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Preferred Time</label>
+            <input type="time" name="time" required class="input-base" />
+          </div>
+        </div>
+
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Session Format</label>
+          <select name="format" class="input-base">
+            <option value="zoom">Zoom (primary)</option>
+            <option value="phone">Phone (upon request)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">
+            Notes <span class="font-normal" style="color:var(--muted)">(optional)</span>
+          </label>
+          <textarea name="notes" rows="3" placeholder="A question you're sitting with, a situation you'd like to explore..." class="input-base"></textarea>
+        </div>
+
+        <!-- Price summary -->
+        <div id="priceSummary" style="display:none; background:rgba(201,146,42,0.08); border:1px solid rgba(201,146,42,0.2);" class="rounded-lg p-4">
+          <p class="font-body text-sm" style="color:var(--muted)">Session total</p>
+          <p class="font-display text-2xl font-bold" style="color:var(--primary)" id="priceDisplay"></p>
+          <p class="mt-1 font-body text-xs" style="color:var(--muted)">Full payment required at booking. 24-hour notice required to reschedule. One reschedule per booking. Missed appointments are non-refundable.</p>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn-gold w-full py-3.5">Review Booking ✦</button>
+      </form>
+    </div>
+
+    <!-- STEP 2: Review & Confirm -->
+    <div id="reviewStep" style="display:none;" class="animate-fade-in-up">
+      <div class="card p-8 space-y-6">
+        <div class="text-center pb-2" style="border-bottom:1px solid var(--border)">
+          <div class="text-3xl mb-2">🔮</div>
+          <h2 class="font-display text-2xl font-bold" style="color:var(--fg)">Review Your Booking</h2>
+          <p class="font-body text-sm mt-1" style="color:var(--muted)">Please confirm everything looks correct before we lock in your session.</p>
+        </div>
+
+        <!-- Summary rows -->
+        <div class="space-y-3" id="reviewRows"></div>
+
+        <!-- Cancellation policy reminder -->
+        <div class="rounded-lg p-4" style="background:rgba(110,77,153,0.08);border:1px solid rgba(110,77,153,0.2);">
+          <p class="font-body text-xs leading-relaxed" style="color:var(--muted)">
+            ✦ <strong style="color:var(--fg)">Cancellation Policy:</strong> 24-hour notice required to reschedule. One reschedule allowed per booking. Missed appointments are non-refundable. Full payment is due at the time of booking.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <button id="backBtn" class="flex-1 rounded-lg border font-body text-sm font-medium py-3 transition-colors"
+                  style="border-color:var(--border);color:var(--muted);background:none;cursor:pointer;"
+                  onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+                  onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+            ← Edit Details
+          </button>
+          <button id="confirmBtn" class="flex-1 btn-gold py-3">Confirm & Book Session ✨</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById('dateInput').min = new Date().toISOString().split('T')[0];
+
+  const serviceSelect  = document.getElementById('serviceSelect');
+  const birthSection   = document.getElementById('birthInfoSection');
+  const priceSummary   = document.getElementById('priceSummary');
+  const priceDisplay   = document.getElementById('priceDisplay');
+
+  function onServiceChange() {
+    const opt = serviceSelect.options[serviceSelect.selectedIndex];
+    const requiresBirth = opt.dataset && opt.dataset.requiresBirth === 'true';
+    const price = opt.dataset && opt.dataset.price;
+    birthSection.style.display = requiresBirth ? 'block' : 'none';
+    if (price) {
+      priceDisplay.textContent = '$' + parseFloat(price).toFixed(2);
+      priceSummary.style.display = 'block';
+    } else {
+      priceSummary.style.display = 'none';
+    }
+  }
+
+  serviceSelect.addEventListener('change', onServiceChange);
+  if (serviceSelect.value) onServiceChange();
+
+  // ── Collect form data
+  function collectFormData() {
+    const fd = new FormData(document.getElementById('bookingForm'));
+    return Object.fromEntries(fd.entries());
+  }
+
+  // ── STEP 1 → STEP 2: validate with server, show review
+  document.getElementById('bookingForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true; btn.textContent = 'Checking availability…';
+
+    const payload = collectFormData();
+    const { ok, data } = await api.post('/api/booking/preview', payload);
+
+    btn.disabled = false; btn.textContent = 'Review Booking ✦';
+
+    if (!ok) {
+      showToast(data.error || 'Please check your details and try again.', 'error');
+      return;
+    }
+
+    // Build review rows
+    const s = data.summary;
+    const rows = [
+      ['Session',  s.serviceName],
+      ['Duration', s.duration],
+      ['Price',    '$' + parseFloat(s.price).toFixed(2)],
+      ['Name',     s.name],
+      ['Email',    s.email],
+      ['Date',     formatDate(s.date)],
+      ['Time',     formatTime(s.time)],
+      ['Format',   s.format === 'zoom' ? 'Zoom' : 'Phone'],
+    ];
+    if (s.requiresBirth && s.birthDate) {
+      rows.push(['Date of Birth', s.birthDate]);
+      if (s.birthTime)     rows.push(['Birth Time',     s.birthTime]);
+      if (s.birthLocation) rows.push(['Birth Location', s.birthLocation]);
+    }
+    if (s.notes) rows.push(['Notes', s.notes]);
+
+    document.getElementById('reviewRows').innerHTML = rows.map(([label, val]) => `
+      <div class="flex justify-between gap-4" style="border-bottom:1px solid rgba(32,36,64,.4);padding-bottom:.75rem;">
+        <span class="font-body text-sm" style="color:var(--muted);min-width:120px">${label}</span>
+        <span class="font-body text-sm font-medium text-right flex-1" style="color:var(--fg)">${val}</span>
+      </div>`).join('');
+
+    // Stash summary for confirm step
+    document.getElementById('confirmBtn').dataset.summary = JSON.stringify(s);
+
+    // Switch steps
+    document.getElementById('formStep').style.display   = 'none';
+    document.getElementById('reviewStep').style.display = 'block';
+    document.getElementById('step2dot').style.background  = 'var(--primary)';
+    document.getElementById('step2dot').style.color       = '#0e0f1a';
+    document.getElementById('step2label').style.color     = 'var(--primary)';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ── Back to Step 1
+  document.getElementById('backBtn').addEventListener('click', () => {
+    document.getElementById('reviewStep').style.display  = 'none';
+    document.getElementById('formStep').style.display    = 'block';
+    document.getElementById('step2dot').style.background = 'var(--border)';
+    document.getElementById('step2dot').style.color      = 'var(--muted)';
+    document.getElementById('step2label').style.color    = 'var(--muted)';
+  });
+
+  // ── STEP 2 → Confirm: write to DB
+  document.getElementById('confirmBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('confirmBtn');
+    btn.disabled = true; btn.textContent = 'Confirming your session…';
+
+    const summary  = JSON.parse(btn.dataset.summary || '{}');
+    const { ok, data } = await api.post('/api/booking/confirm', {
+      name:          summary.name,
+      email:         summary.email,
+      serviceId:     summary.serviceId,
+      date:          summary.date,
+      time:          summary.time,
+      format:        summary.format,
+      notes:         summary.notes,
+      birthDate:     summary.birthDate,
+      birthTime:     summary.birthTime,
+      birthLocation: summary.birthLocation,
+    });
+
+    if (ok) {
+      window.location.href = '/booking/success?id=' + data.bookingId;
+    } else {
+      showToast(data.error || 'Something went wrong. Please try again.', 'error');
+      btn.disabled = false; btn.textContent = 'Confirm & Book Session ✨';
+    }
+  });
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const [y, m, day] = d.split('-');
+    return new Date(y, m - 1, day).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  }
+  function formatTime(t) {
+    if (!t) return '—';
+    const [h, m] = t.split(':');
+    const hr = parseInt(h);
+    return `${hr > 12 ? hr - 12 : hr || 12}:${m} ${hr >= 12 ? 'PM' : 'AM'}`;
+  }
+</script>
+{% endblock %}
