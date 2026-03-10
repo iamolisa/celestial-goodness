@@ -27,13 +27,11 @@
     <div id="statsGrid" class="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-7"></div>
 
     <!-- Tabs -->
-    <div class="mb-6 flex gap-1 overflow-x-auto" style="border-bottom:1px solid var(--border);padding-bottom:0;">
+    <div class="mb-6 flex gap-1 overflow-x-auto" style="border-bottom:1px solid var(--border);">
       {% for tab, label, icon in [('bookings','Bookings','📅'),('testimonials','Testimonials','⭐'),('contacts','Messages','✉️'),('subscribers','Subscribers','📬'),('blog','Blog','📝')] %}
       <button class="tab-btn font-body text-sm font-medium px-4 py-2.5 whitespace-nowrap transition-all"
               data-tab="{{ tab }}"
-              style="background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);border-radius:.375rem .375rem 0 0;"
-              onmouseover="if(!this.classList.contains('active'))this.style.color='var(--fg)'"
-              onmouseout="if(!this.classList.contains('active'))this.style.color='var(--muted)'">
+              style="background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);border-radius:.375rem .375rem 0 0;">
         {{ icon }} {{ label }} <span id="badge-{{ tab }}" class="ml-1 rounded-full px-1.5 py-0.5 text-xs font-bold" style="background:rgba(201,146,42,.15);color:var(--primary);display:none;"></span>
       </button>
       {% endfor %}
@@ -62,12 +60,14 @@
         <table class="w-full text-left">
           <thead>
             <tr style="border-bottom:1px solid var(--border)">
-              {% for h in ['ID','Client','Service','Date & Time','Format','Price','Payment','Status','Actions'] %}
+              {% for h in ['ID','Client','Service','Date & Time','Zoom','Payment','Status','Actions'] %}
               <th class="px-4 py-3 font-body text-xs font-semibold uppercase tracking-wider" style="color:var(--muted)">{{ h }}</th>
               {% endfor %}
             </tr>
           </thead>
-          <tbody id="bookingsBody"><tr><td colspan="9" class="py-12 text-center font-body text-sm" style="color:var(--muted)">Loading…</td></tr></tbody>
+          <tbody id="bookingsBody">
+            <tr><td colspan="8" class="py-12 text-center font-body text-sm" style="color:var(--muted)">Loading…</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -75,10 +75,10 @@
     <!-- ── TESTIMONIALS TAB ── -->
     <div id="tab-testimonials" class="tab-panel" style="display:none">
       <div class="mb-4 flex items-center justify-between">
-        <p class="font-body text-sm" style="color:var(--muted)">Pending testimonials require your approval before appearing on the public site.</p>
+        <p class="font-body text-sm" style="color:var(--muted)">Pending testimonials need your approval before appearing publicly.</p>
         <select id="tFilter" class="input-base" style="width:auto;">
           <option value="all">All</option>
-          <option value="pending">Pending Approval</option>
+          <option value="pending">Pending</option>
           <option value="approved">Approved</option>
         </select>
       </div>
@@ -93,7 +93,7 @@
     <!-- ── SUBSCRIBERS TAB ── -->
     <div id="tab-subscribers" class="tab-panel" style="display:none">
       <div class="mb-4 flex items-center justify-between">
-        <p class="font-body text-sm" style="color:var(--muted)">Email newsletter subscribers.</p>
+        <p class="font-body text-sm" style="color:var(--muted)">Newsletter subscribers.</p>
         <button onclick="exportSubscribers()" class="btn-gold px-4 py-2 text-sm">Export CSV</button>
       </div>
       <div class="overflow-x-auto card">
@@ -105,7 +105,9 @@
               <th class="px-4 py-3 font-body text-xs font-semibold uppercase tracking-wider" style="color:var(--muted)">Subscribed</th>
             </tr>
           </thead>
-          <tbody id="subscribersBody"><tr><td colspan="3" class="py-12 text-center font-body text-sm" style="color:var(--muted)">Loading…</td></tr></tbody>
+          <tbody id="subscribersBody">
+            <tr><td colspan="3" class="py-12 text-center font-body text-sm" style="color:var(--muted)">Loading…</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -119,44 +121,115 @@
       <div id="blogList" class="space-y-3"></div>
     </div>
 
-  </div>
-</div>
+  </div><!-- /max-w-7xl -->
 
-<!-- Blog Post Modal -->
-<div id="postModal" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(14,15,26,.85);backdrop-filter:blur(6px);overflow-y:auto;">
-  <div class="min-h-screen flex items-start justify-center py-10 px-4">
-    <div class="card p-8 w-full max-w-2xl space-y-5 relative">
-      <button onclick="closePostModal()" style="position:absolute;top:1.25rem;right:1.25rem;background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.25rem;">✕</button>
-      <h2 id="modalTitle" class="font-display text-xl font-bold" style="color:var(--fg)">New Blog Post</h2>
-      <input type="hidden" id="postId" value="" />
-      <div>
-        <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Title</label>
-        <input type="text" id="postTitle" placeholder="Post title" class="input-base" />
-      </div>
-      <div>
-        <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Category <span style="color:var(--muted)">(optional)</span></label>
-        <input type="text" id="postCategory" placeholder="e.g. Astrology, Tarot, Moon Cycles" class="input-base" />
-      </div>
-      <div>
-        <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Excerpt <span style="color:var(--muted)">(short summary)</span></label>
-        <textarea id="postExcerpt" rows="2" placeholder="A brief teaser shown in the blog listing…" class="input-base"></textarea>
-      </div>
-      <div>
-        <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Body</label>
-        <textarea id="postBody" rows="10" placeholder="Write your post here…" class="input-base"></textarea>
-      </div>
-      <div class="flex items-center gap-3">
-        <input type="checkbox" id="postPublished" style="accent-color:var(--primary);width:1rem;height:1rem;" />
-        <label for="postPublished" class="font-body text-sm" style="color:var(--fg)">Publish immediately</label>
-      </div>
-      <div class="flex gap-3 pt-2">
-        <button onclick="closePostModal()" class="flex-1 rounded-lg border font-body text-sm py-2.5" style="border-color:var(--border);color:var(--muted);background:none;cursor:pointer;">Cancel</button>
-        <button onclick="savePost()" class="flex-1 btn-gold py-2.5 text-sm">Save Post</button>
+  <!-- ══════════════════════════════════════════
+       RESCHEDULE MODAL — inside block body
+  ══════════════════════════════════════════ -->
+  <div id="rescheduleModal" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(14,15,26,.88);backdrop-filter:blur(6px);">
+    <div class="min-h-screen flex items-center justify-center p-4">
+      <div class="card p-8 w-full max-w-sm space-y-5 relative">
+        <button onclick="closeRescheduleModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.2rem;line-height:1;">✕</button>
+        <h3 class="font-display text-xl font-bold" style="color:var(--fg)">Reschedule Booking</h3>
+        <input type="hidden" id="rescheduleId" />
+
+        <div class="rounded-lg p-3" style="background:rgba(201,146,42,.08);border:1px solid rgba(201,146,42,.2);">
+          <p class="font-body text-xs leading-relaxed" style="color:var(--muted)">
+            ✦ One reschedule per booking, 24-hour notice required. Once rescheduled, no further changes are permitted.
+          </p>
+        </div>
+
+        <div id="rescheduleAlreadyDone" style="display:none;" class="rounded-lg p-3" style="border:1px solid #e74c3c;">
+          <p class="font-body text-xs" style="color:#e74c3c;">⚠ This booking has already been rescheduled once and cannot be changed again.</p>
+        </div>
+
+        <div id="rescheduleForm">
+          <div class="space-y-4">
+            <div>
+              <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">New Date</label>
+              <input type="date" id="rescheduleDate" class="input-base" />
+            </div>
+            <div>
+              <label class="mb-2 block font-body text-sm font-medium" style="color:var(--fg)">New Time</label>
+              <div id="rescheduleSlotsGrid" class="grid grid-cols-3 gap-2">
+                <p class="col-span-3 font-body text-xs" style="color:var(--muted)">Select a date first.</p>
+              </div>
+              <input type="hidden" id="rescheduleTime" />
+            </div>
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button onclick="closeRescheduleModal()" class="flex-1 rounded-lg border font-body text-sm py-2.5"
+                    style="border-color:var(--border);color:var(--muted);background:none;cursor:pointer;">Cancel</button>
+            <button onclick="submitReschedule()" id="rescheduleSubmitBtn" class="flex-1 btn-gold py-2.5 text-sm">Confirm Reschedule</button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
-</div>
 
+  <!-- ══════════════════════════════════════════
+       ZOOM LINK MODAL — inside block body
+  ══════════════════════════════════════════ -->
+  <div id="zoomModal" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(14,15,26,.88);backdrop-filter:blur(6px);">
+    <div class="min-h-screen flex items-center justify-center p-4">
+      <div class="card p-8 w-full max-w-sm space-y-5 relative">
+        <button onclick="closeZoomModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.2rem;line-height:1;">✕</button>
+        <h3 class="font-display text-xl font-bold" style="color:var(--fg)">Add Zoom Link</h3>
+        <p class="font-body text-sm" style="color:var(--muted)">Paste the Zoom meeting link for this session.</p>
+        <input type="hidden" id="zoomBookingId" />
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Zoom Link</label>
+          <input type="url" id="zoomLinkInput" placeholder="https://zoom.us/j/..." class="input-base" />
+        </div>
+        <div class="flex gap-3 pt-1">
+          <button onclick="closeZoomModal()" class="flex-1 rounded-lg border font-body text-sm py-2.5"
+                  style="border-color:var(--border);color:var(--muted);background:none;cursor:pointer;">Cancel</button>
+          <button onclick="submitZoomLink()" class="flex-1 btn-gold py-2.5 text-sm">Save Link</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       BLOG POST MODAL — inside block body
+  ══════════════════════════════════════════ -->
+  <div id="postModal" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(14,15,26,.88);backdrop-filter:blur(6px);overflow-y:auto;">
+    <div class="min-h-screen flex items-start justify-center py-10 px-4">
+      <div class="card p-8 w-full max-w-2xl space-y-5 relative">
+        <button onclick="closePostModal()" style="position:absolute;top:1.25rem;right:1.25rem;background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.25rem;line-height:1;">✕</button>
+        <h2 id="modalTitle" class="font-display text-xl font-bold" style="color:var(--fg)">New Blog Post</h2>
+        <input type="hidden" id="postId" value="" />
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Title</label>
+          <input type="text" id="postTitle" placeholder="Post title" class="input-base" />
+        </div>
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Category <span style="color:var(--muted)">(optional)</span></label>
+          <input type="text" id="postCategory" placeholder="e.g. Astrology, Tarot, Moon Cycles" class="input-base" />
+        </div>
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Excerpt</label>
+          <textarea id="postExcerpt" rows="2" placeholder="A brief teaser shown in the blog listing…" class="input-base"></textarea>
+        </div>
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Body</label>
+          <textarea id="postBody" rows="10" placeholder="Write your post here…" class="input-base"></textarea>
+        </div>
+        <div class="flex items-center gap-3">
+          <input type="checkbox" id="postPublished" style="accent-color:var(--primary);width:1rem;height:1rem;" />
+          <label for="postPublished" class="font-body text-sm" style="color:var(--fg)">Publish immediately</label>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button onclick="closePostModal()" class="flex-1 rounded-lg border font-body text-sm py-2.5"
+                  style="border-color:var(--border);color:var(--muted);background:none;cursor:pointer;">Cancel</button>
+          <button onclick="savePost()" class="flex-1 btn-gold py-2.5 text-sm">Save Post</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /min-h-screen -->
 {% endblock %}
 
 {% block scripts %}
@@ -195,8 +268,13 @@ function loadTab(name) {
    STATS
 ══════════════════════════════════════════════ */
 async function loadStats() {
-  const { ok, data } = await api.get('/api/admin/stats');
-  if (!ok) { window.location.href = '/admin'; return; }
+  const { ok, status, data } = await api.get('/api/admin/stats');
+  if (!ok) {
+    // Only redirect if truly unauthorised (401), not on network hiccup
+    if (status === 401) { window.location.href = '/admin'; return; }
+    showToast('Could not load stats — please refresh.', 'error');
+    return;
+  }
 
   const cards = [
     { label:'Total Bookings',  value: data.totalBookings,       icon:'📅' },
@@ -216,9 +294,8 @@ async function loadStats() {
       <p class="font-display text-2xl font-bold" style="color:var(--fg)">${c.value}</p>
     </div>`).join('');
 
-  // Badges
   if (data.pendingTestimonials > 0) showBadge('testimonials', data.pendingTestimonials);
-  if (data.unreadContacts > 0)      showBadge('contacts',     data.unreadContacts);
+  if (data.unreadContacts > 0)      showBadge('contacts', data.unreadContacts);
 }
 
 function showBadge(tab, count) {
@@ -251,9 +328,10 @@ function renderBookings() {
 
   const tbody = document.getElementById('bookingsBody');
   if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="9" class="py-12 text-center font-body text-sm" style="color:var(--muted)">No bookings found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="py-12 text-center font-body text-sm" style="color:var(--muted)">No bookings found.</td></tr>';
     return;
   }
+
   tbody.innerHTML = list.map(b => `
     <tr style="border-bottom:1px solid rgba(32,36,64,.5);transition:background .15s;"
         onmouseover="this.style.background='rgba(19,22,43,.6)'" onmouseout="this.style.background=''">
@@ -263,9 +341,16 @@ function renderBookings() {
         <div class="font-body text-xs" style="color:var(--muted)">${b.email}</div>
       </td>
       <td class="px-4 py-3 font-body text-xs" style="color:var(--fg);max-width:160px">${b.serviceName}</td>
-      <td class="px-4 py-3 font-body text-xs" style="color:var(--fg)">${b.date}<br><span style="color:var(--muted)">${b.time}</span></td>
-      <td class="px-4 py-3 font-body text-xs" style="color:var(--muted)">${b.format || 'zoom'}</td>
-      <td class="px-4 py-3 font-body text-sm font-semibold" style="color:var(--primary)">$${parseFloat(b.price||0).toFixed(2)}</td>
+      <td class="px-4 py-3 font-body text-xs" style="color:var(--fg)">${b.date}<br><span style="color:var(--muted)">${fmtTime(b.time)}</span></td>
+      <td class="px-4 py-3">
+        ${b.zoomLink
+          ? `<a href="${b.zoomLink}" target="_blank" class="font-body text-xs" style="color:var(--primary)">Join ↗</a>`
+          : `<button onclick="openZoomModal('${b.id}')"
+               style="background:none;border:1px dashed var(--border);border-radius:.375rem;padding:.2rem .6rem;color:var(--muted);cursor:pointer;font-family:var(--font-body);font-size:.7rem;transition:border-color .15s,color .15s;"
+               onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+               onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">+ Add</button>`
+        }
+      </td>
       <td class="px-4 py-3">
         <select onchange="updatePayment('${b.id}', this.value)"
                 class="input-base" style="width:auto;padding:.25rem .5rem;font-size:.75rem;">
@@ -277,13 +362,24 @@ function renderBookings() {
       <td class="px-4 py-3"><span class="badge badge-${b.status}">${b.status}</span></td>
       <td class="px-4 py-3">
         <div class="flex items-center gap-1">
+          ${b.status === 'upcoming' ? `
+            <button onclick="openRescheduleModal('${b.id}', '${b.date}', '${b.time}', ${b.rescheduleCount||0})"
+                    title="${(b.rescheduleCount||0)>=1 ? 'Already rescheduled' : 'Reschedule'}"
+                    ${(b.rescheduleCount||0)>=1 ? 'disabled style="opacity:.35;cursor:not-allowed;"' : ''}
+                    style="background:none;border:none;cursor:pointer;padding:.3rem;border-radius:.3rem;color:var(--muted);"
+                    onmouseover="if(!this.disabled){this.style.background='rgba(201,146,42,.15)';this.style.color='var(--primary)'}"
+                    onmouseout="this.style.background='';this.style.color='var(--muted)'">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
+              </svg>
+            </button>` : ''}
           ${b.status !== 'completed' ? `
-          <button onclick="markComplete('${b.id}')" title="Mark completed"
-                  style="background:none;border:none;cursor:pointer;padding:.3rem;border-radius:.3rem;color:var(--muted);"
-                  onmouseover="this.style.background='rgba(47,179,127,.15)';this.style.color='#2fb37f'"
-                  onmouseout="this.style.background='';this.style.color='var(--muted)'">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          </button>` : ''}
+            <button onclick="markComplete('${b.id}')" title="Mark completed"
+                    style="background:none;border:none;cursor:pointer;padding:.3rem;border-radius:.3rem;color:var(--muted);"
+                    onmouseover="this.style.background='rgba(47,179,127,.15)';this.style.color='#2fb37f'"
+                    onmouseout="this.style.background='';this.style.color='var(--muted)'">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>` : ''}
           <button onclick="deleteBooking('${b.id}')" title="Delete"
                   style="background:none;border:none;cursor:pointer;padding:.3rem;border-radius:.3rem;color:var(--muted);"
                   onmouseover="this.style.background='rgba(231,76,60,.15)';this.style.color='#e74c3c'"
@@ -313,6 +409,133 @@ async function deleteBooking(id) {
   document.getElementById(id).addEventListener('input', renderBookings));
 
 /* ══════════════════════════════════════════════
+   RESCHEDULE MODAL
+══════════════════════════════════════════════ */
+function openRescheduleModal(id, currentDate, currentTime, rescheduleCount) {
+  const modal     = document.getElementById('rescheduleModal');
+  const alreadyEl = document.getElementById('rescheduleAlreadyDone');
+  const formEl    = document.getElementById('rescheduleForm');
+  const dateEl    = document.getElementById('rescheduleDate');
+  const gridEl    = document.getElementById('rescheduleSlotsGrid');
+
+  document.getElementById('rescheduleId').value = id;
+  dateEl.min   = new Date().toISOString().split('T')[0];
+  dateEl.value = '';
+  document.getElementById('rescheduleTime').value = '';
+  gridEl.innerHTML = '<p class="col-span-3 font-body text-xs" style="color:var(--muted)">Select a date first.</p>';
+
+  if (rescheduleCount >= 1) {
+    alreadyEl.style.display = 'block';
+    formEl.style.display    = 'none';
+  } else {
+    alreadyEl.style.display = 'none';
+    formEl.style.display    = 'block';
+  }
+
+  modal.style.display = 'block';
+}
+
+function closeRescheduleModal() {
+  document.getElementById('rescheduleModal').style.display = 'none';
+}
+
+document.getElementById('rescheduleDate').addEventListener('change', async function() {
+  const date = this.value;
+  if (!date) return;
+  const grid = document.getElementById('rescheduleSlotsGrid');
+  grid.innerHTML = '<p class="col-span-3 font-body text-xs" style="color:var(--muted)">Loading…</p>';
+  document.getElementById('rescheduleTime').value = '';
+
+  const bookingId = document.getElementById('rescheduleId').value;
+  const { ok, data } = await api.get(`/api/booking/slots?date=${date}&exclude=${bookingId}`);
+  if (!ok || !data.slots) {
+    grid.innerHTML = '<p class="col-span-3 font-body text-xs" style="color:var(--muted)">Could not load slots.</p>';
+    return;
+  }
+  if (data.message) {
+    grid.innerHTML = `<p class="col-span-3 font-body text-xs" style="color:var(--muted)">${data.message}</p>`;
+    return;
+  }
+
+  grid.innerHTML = '';
+  if (!data.slots.length) {
+    grid.innerHTML = '<p class="col-span-3 font-body text-xs" style="color:var(--muted)">No available slots on this date.</p>';
+    return;
+  }
+  // Every slot returned is already confirmed available — no need to check slot.available
+  data.slots.forEach(slot => {
+    const btn = document.createElement('button');
+    btn.type        = 'button';
+    btn.textContent = fmtTime(slot.time);
+    const base = 'font-family:var(--font-body);font-size:.75rem;font-weight:500;border-radius:.4rem;padding:.4rem .2rem;cursor:pointer;transition:all .15s;border:1px solid;';
+    btn.style.cssText = base + 'background:transparent;border-color:var(--border);color:var(--muted);';
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('button').forEach(b => {
+        b.style.background  = 'transparent';
+        b.style.borderColor = 'var(--border)';
+        b.style.color       = 'var(--muted)';
+      });
+      btn.style.background  = 'var(--primary)';
+      btn.style.borderColor = 'var(--primary)';
+      btn.style.color       = '#0e0f1a';
+      document.getElementById('rescheduleTime').value = slot.time;
+    });
+    grid.appendChild(btn);
+  });
+});
+
+async function submitReschedule() {
+  const id   = document.getElementById('rescheduleId').value;
+  const date = document.getElementById('rescheduleDate').value;
+  const time = document.getElementById('rescheduleTime').value;
+  if (!date) { showToast('Please select a new date.', 'error'); return; }
+  if (!time) { showToast('Please select a time slot.',  'error'); return; }
+
+  const btn = document.getElementById('rescheduleSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const { ok, data } = await api.patch(`/api/admin/bookings/${id}/reschedule`, { date, time });
+  btn.disabled = false; btn.textContent = 'Confirm Reschedule';
+
+  if (ok) {
+    showToast('Booking rescheduled ✓');
+    closeRescheduleModal();
+    loadBookings();
+    loadStats();
+  } else {
+    showToast(data.error || 'Could not reschedule.', 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════
+   ZOOM LINK MODAL
+══════════════════════════════════════════════ */
+function openZoomModal(bookingId) {
+  document.getElementById('zoomBookingId').value  = bookingId;
+  document.getElementById('zoomLinkInput').value  = '';
+  document.getElementById('zoomModal').style.display = 'block';
+}
+
+function closeZoomModal() {
+  document.getElementById('zoomModal').style.display = 'none';
+}
+
+async function submitZoomLink() {
+  const id   = document.getElementById('zoomBookingId').value;
+  const link = document.getElementById('zoomLinkInput').value.trim();
+  if (!link) { showToast('Please enter a Zoom link.', 'error'); return; }
+
+  const { ok, data } = await api.patch(`/api/admin/bookings/${id}/zoom`, { zoomLink: link });
+  if (ok) {
+    showToast('Zoom link saved ✓');
+    closeZoomModal();
+    loadBookings();
+  } else {
+    showToast(data.error || 'Could not save link.', 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════
    TESTIMONIALS
 ══════════════════════════════════════════════ */
 let allTestimonials = [];
@@ -326,18 +549,14 @@ async function loadTestimonials() {
 
 function renderTestimonials() {
   const filter = document.getElementById('tFilter').value;
-  const list = allTestimonials.filter(t =>
-    filter === 'all' ? true :
-    filter === 'pending' ? !t.approved :
-    t.approved
+  const list   = allTestimonials.filter(t =>
+    filter === 'all' ? true : filter === 'pending' ? !t.approved : t.approved
   );
-
   const grid = document.getElementById('testimonialsGrid');
   if (!list.length) {
     grid.innerHTML = '<div class="col-span-3 py-12 text-center font-body text-sm" style="color:var(--muted)">No testimonials found.</div>';
     return;
   }
-
   grid.innerHTML = list.map(t => `
     <div class="card p-6 flex flex-col gap-3" style="${t.approved ? '' : 'border-color:rgba(201,146,42,.3)'}">
       <div class="flex items-start justify-between gap-2">
@@ -360,7 +579,7 @@ function renderTestimonials() {
           ${t.approved ? 'Unapprove' : 'Approve ✓'}
         </button>
         <button onclick="deleteTestimonial(${t.id})"
-                class="rounded-lg border font-body text-xs px-3 py-1.5 cursor-pointer transition-colors"
+                class="rounded-lg border font-body text-xs px-3 py-1.5 cursor-pointer"
                 style="background:none;border-color:var(--border);color:var(--muted);"
                 onmouseover="this.style.borderColor='var(--destructive)';this.style.color='var(--destructive)'"
                 onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
@@ -372,17 +591,13 @@ function renderTestimonials() {
 
 async function toggleTestimonial(id) {
   const { ok, data } = await api.patch(`/api/admin/testimonials/${id}/approve`);
-  if (ok) {
-    showToast(data.approved ? 'Testimonial approved ✓' : 'Testimonial unapproved');
-    loadTestimonials(); loadStats();
-  }
+  if (ok) { showToast(data.approved ? 'Approved ✓' : 'Unapproved'); loadTestimonials(); loadStats(); }
 }
 async function deleteTestimonial(id) {
   if (!confirm('Delete this testimonial?')) return;
   const { ok } = await api.delete(`/api/admin/testimonials/${id}`);
-  if (ok) { showToast('Testimonial deleted'); loadTestimonials(); loadStats(); }
+  if (ok) { showToast('Deleted'); loadTestimonials(); loadStats(); }
 }
-
 document.getElementById('tFilter').addEventListener('change', renderTestimonials);
 
 /* ══════════════════════════════════════════════
@@ -401,25 +616,24 @@ async function loadContacts() {
       <div class="flex items-start justify-between gap-4">
         <div>
           <p class="font-display text-base font-semibold" style="color:var(--fg)">${c.name}</p>
-          <a href="mailto:${c.email}" class="font-body text-sm transition-colors" style="color:var(--primary)">${c.email}</a>
+          <a href="mailto:${c.email}" class="font-body text-sm" style="color:var(--primary)">${c.email}</a>
           <p class="font-body text-xs mt-1" style="color:var(--muted)">${new Date(c.createdAt).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
         </div>
         <button onclick="deleteContact(${c.id})"
-                style="background:none;border:none;cursor:pointer;padding:.3rem;border-radius:.3rem;color:var(--muted);"
-                onmouseover="this.style.color='var(--destructive)'" onmouseout="this.style.color='var(--muted)'" title="Delete">
+                style="background:none;border:none;cursor:pointer;padding:.3rem;color:var(--muted);"
+                onmouseover="this.style.color='var(--destructive)'" onmouseout="this.style.color='var(--muted)'">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
         </button>
       </div>
       <p class="font-body text-sm leading-relaxed" style="color:var(--muted);white-space:pre-wrap">${c.message}</p>
-      <a href="mailto:${c.email}?subject=Re: Your message to Celestial Goodness"
-         class="btn-gold self-start px-4 py-1.5 text-xs">Reply via Email</a>
+      <a href="mailto:${c.email}?subject=Re: Your message to Celestial Goodness" class="btn-gold self-start px-4 py-1.5 text-xs">Reply via Email</a>
     </div>`).join('');
 }
 
 async function deleteContact(id) {
   if (!confirm('Delete this message?')) return;
   const { ok } = await api.delete(`/api/admin/contacts/${id}`);
-  if (ok) { showToast('Message deleted'); loadContacts(); loadStats(); }
+  if (ok) { showToast('Deleted'); loadContacts(); loadStats(); }
 }
 
 /* ══════════════════════════════════════════════
@@ -438,7 +652,7 @@ async function loadSubscribers() {
   }
   tbody.innerHTML = data.map((s, i) => `
     <tr style="border-bottom:1px solid rgba(32,36,64,.5)">
-      <td class="px-4 py-3 font-body text-xs" style="color:var(--muted)">${i + 1}</td>
+      <td class="px-4 py-3 font-body text-xs" style="color:var(--muted)">${i+1}</td>
       <td class="px-4 py-3 font-body text-sm" style="color:var(--fg)">${s.email}</td>
       <td class="px-4 py-3 font-body text-xs" style="color:var(--muted)">${new Date(s.createdAt).toLocaleDateString()}</td>
     </tr>`).join('');
@@ -447,11 +661,9 @@ async function loadSubscribers() {
 function exportSubscribers() {
   if (!allSubscribers.length) { showToast('No subscribers to export', 'error'); return; }
   const csv = 'Email,Subscribed On\n' + allSubscribers.map(s =>
-    `${s.email},${new Date(s.createdAt).toLocaleDateString()}`
-  ).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
+    `${s.email},${new Date(s.createdAt).toLocaleDateString()}`).join('\n');
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
   a.download = 'celestial-subscribers.csv';
   a.click();
 }
@@ -475,8 +687,7 @@ async function loadBlog() {
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 mb-1">
           <span class="rounded-full px-2 py-0.5 font-body text-xs font-semibold"
-                style="background:${p.published ? 'rgba(47,179,127,.15)' : 'rgba(201,146,42,.1)'};
-                       color:${p.published ? '#2fb37f' : 'var(--primary)'}">
+                style="background:${p.published ? 'rgba(47,179,127,.15)' : 'rgba(201,146,42,.1)'};color:${p.published ? '#2fb37f' : 'var(--primary)'}">
             ${p.published ? 'Published' : 'Draft'}
           </span>
           ${p.category ? `<span class="font-body text-xs" style="color:var(--muted)">${p.category}</span>` : ''}
@@ -498,55 +709,50 @@ async function loadBlog() {
     </div>`).join('');
 }
 
-function openPostModal(data = null) {
-  document.getElementById('modalTitle').textContent   = data ? 'Edit Blog Post' : 'New Blog Post';
-  document.getElementById('postId').value             = data ? data.id : '';
-  document.getElementById('postTitle').value          = data ? data.title : '';
-  document.getElementById('postCategory').value       = data ? (data.category || '') : '';
-  document.getElementById('postExcerpt').value        = data ? (data.excerpt || '') : '';
-  document.getElementById('postBody').value           = data ? data.body : '';
-  document.getElementById('postPublished').checked    = data ? data.published : false;
-  document.getElementById('postModal').style.display  = 'block';
+function openPostModal(data=null) {
+  document.getElementById('modalTitle').textContent    = data ? 'Edit Blog Post' : 'New Blog Post';
+  document.getElementById('postId').value              = data ? data.id : '';
+  document.getElementById('postTitle').value           = data ? data.title : '';
+  document.getElementById('postCategory').value        = data ? (data.category||'') : '';
+  document.getElementById('postExcerpt').value         = data ? (data.excerpt||'') : '';
+  document.getElementById('postBody').value            = data ? data.body : '';
+  document.getElementById('postPublished').checked     = data ? data.published : false;
+  document.getElementById('postModal').style.display   = 'block';
 }
-
-function closePostModal() {
-  document.getElementById('postModal').style.display = 'none';
-}
-
-function editPost(id) {
-  const post = allPosts.find(p => p.id === id);
-  if (post) openPostModal(post);
-}
+function closePostModal() { document.getElementById('postModal').style.display = 'none'; }
+function editPost(id) { const p = allPosts.find(p => p.id===id); if (p) openPostModal(p); }
 
 async function savePost() {
-  const id        = document.getElementById('postId').value;
-  const payload   = {
+  const id = document.getElementById('postId').value;
+  const payload = {
     title:     document.getElementById('postTitle').value.trim(),
     category:  document.getElementById('postCategory').value.trim(),
     excerpt:   document.getElementById('postExcerpt').value.trim(),
     body:      document.getElementById('postBody').value.trim(),
     published: document.getElementById('postPublished').checked,
   };
-  if (!payload.title || !payload.body) { showToast('Title and body are required.', 'error'); return; }
-
+  if (!payload.title || !payload.body) { showToast('Title and body required.', 'error'); return; }
   const { ok } = id
     ? await api.patch(`/api/admin/blog/${id}`, payload)
     : await api.post('/api/admin/blog', payload);
-
-  if (ok) {
-    showToast(id ? 'Post updated ✓' : 'Post created ✓');
-    closePostModal();
-    tabLoaded['blog'] = false;
-    loadBlog();
-  } else {
-    showToast('Failed to save post.', 'error');
-  }
+  if (ok) { showToast(id ? 'Post updated ✓' : 'Post created ✓'); closePostModal(); tabLoaded['blog']=false; loadBlog(); }
+  else showToast('Failed to save post.', 'error');
 }
 
 async function deletePost(id) {
-  if (!confirm('Delete this post? This cannot be undone.')) return;
+  if (!confirm('Delete this post?')) return;
   const { ok } = await api.delete(`/api/admin/blog/${id}`);
-  if (ok) { showToast('Post deleted'); tabLoaded['blog'] = false; loadBlog(); }
+  if (ok) { showToast('Post deleted'); tabLoaded['blog']=false; loadBlog(); }
+}
+
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+function fmtTime(t) {
+  if (!t) return '—';
+  const [h, m] = t.split(':');
+  const hr = parseInt(h);
+  return `${hr > 12 ? hr-12 : hr||12}:${m} ${hr>=12?'PM':'AM'}`;
 }
 
 /* ══════════════════════════════════════════════
@@ -560,7 +766,18 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 /* ══════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════ */
-loadStats();
-switchTab('bookings');
+document.addEventListener('DOMContentLoaded', () => {
+  loadStats();
+  switchTab('bookings');
+
+  // Click backdrop to close any modal — prevents UI ever getting stuck
+  ['rescheduleModal', 'zoomModal', 'postModal'].forEach(id => {
+    document.getElementById(id).addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.style.display = 'none';
+      }
+    });
+  });
+});
 </script>
 {% endblock %}

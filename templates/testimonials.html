@@ -1,5 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Testimonials — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block title %}Client Testimonials — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block meta_title %}Client Testimonials — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block meta_description %}Read what clients say about their astrology and tarot sessions with Heather Wiggins at Celestial Goodness. Real stories of clarity, empowerment, and cosmic alignment.{% endblock %}
+{% block meta_keywords %}astrology reading reviews, tarot testimonials, Heather Wiggins reviews, Celestial Goodness client stories, spiritual reading feedback{% endblock %}
+{% block og_title %}Client Testimonials — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block og_description %}Hear from women who have transformed their lives through cosmic guidance with Heather Wiggins at Celestial Goodness.{% endblock %}
 {% block body %}
 
 <section class="bg-gradient-hero star-field pb-24 pt-32">
@@ -7,6 +12,15 @@
     <span class="mb-3 inline-block font-body text-xs font-semibold uppercase tracking-[.3em]" style="color:var(--primary);">&#10022; Client Experiences &#10022;</span>
     <h1 class="font-display text-5xl font-bold" style="color:var(--fg);">Words from Awakened Souls</h1>
     <p class="mt-4 font-body text-base max-w-xl mx-auto" style="color:var(--muted);">Hear from those who have sat with Heather in sacred session.</p>
+    <!-- Heather photo -->
+    <div class="mt-10 flex justify-center js-reveal">
+      <div class="rounded-full overflow-hidden" style="width:140px;height:140px;border:3px solid var(--primary);box-shadow:0 0 30px rgba(201,146,42,0.3);">
+        <img src="{{ url_for('static', filename='images/heather-cafe.jpeg') }}"
+             alt="Heather Wiggins — Celestial Goodness"
+             class="w-full h-full object-cover object-top" />
+      </div>
+    </div>
+    <p class="mt-3 font-display text-sm italic" style="color:var(--primary);">Heather Wiggins</p>
   </div>
 </section>
 

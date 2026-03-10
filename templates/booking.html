@@ -1,25 +1,32 @@
 {% extends "base.html" %}
-{% block title %}Book a Session — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block title %}Book a Reading — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block meta_title %}Book a Reading — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block meta_description %}Book your personalized astrology or tarot reading with Heather Wiggins. Choose from oracle card pulls, celestial blueprint consultations, sovereignty sessions, and more. Secure online booking available.{% endblock %}
+{% block meta_keywords %}book astrology reading, schedule tarot session, oracle card booking, celestial reading appointment, Heather Wiggins booking{% endblock %}
+{% block og_title %}Book a Reading — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block og_description %}Schedule your personal astrology or tarot session with Heather Wiggins. Select your service, choose a time, and step into your cosmic journey.{% endblock %}
 {% block body %}
 
 <section class="bg-gradient-hero star-field pb-12 pt-32">
   <div class="max-w-6xl mx-auto px-4 text-center">
     <span class="section-label">Reserve Your Session</span>
     <h1 class="font-display text-5xl font-bold" style="color:var(--fg)">Book Your Private Reading</h1>
-    <p class="mt-4 font-body text-base" style="color:var(--muted)">All sessions are conducted via Zoom. Full payment is required at the time of booking.</p>
+    <p class="mt-4 font-body text-base" style="color:var(--muted)">All sessions are conducted via Zoom, Monday – Friday. Full payment is required at the time of booking.</p>
   </div>
 </section>
 
 <!-- Step indicator -->
 <div class="max-w-lg mx-auto px-4 pt-10 pb-2">
-  <div class="flex items-center gap-0">
+  <div class="flex items-center">
     <div class="flex items-center gap-2">
-      <div id="step1dot" class="w-8 h-8 rounded-full flex items-center justify-center font-display text-sm font-bold transition-all" style="background:var(--primary);color:#0e0f1a;">1</div>
+      <div id="step1dot" class="w-8 h-8 rounded-full flex items-center justify-center font-display text-sm font-bold"
+           style="background:var(--primary);color:#0e0f1a;">1</div>
       <span class="font-body text-sm font-medium" style="color:var(--primary)">Your Details</span>
     </div>
     <div class="flex-1 mx-3 h-px" style="background:var(--border)"></div>
     <div class="flex items-center gap-2">
-      <div id="step2dot" class="w-8 h-8 rounded-full flex items-center justify-center font-display text-sm font-bold transition-all" style="background:var(--border);color:var(--muted);">2</div>
+      <div id="step2dot" class="w-8 h-8 rounded-full flex items-center justify-center font-display text-sm font-bold"
+           style="background:var(--border);color:var(--muted);">2</div>
       <span id="step2label" class="font-body text-sm" style="color:var(--muted)">Review & Confirm</span>
     </div>
   </div>
@@ -30,18 +37,21 @@
 
     <!-- STEP 1: Form -->
     <div id="formStep">
-      <form id="bookingForm" class="card p-8 space-y-5 animate-fade-in-up">
+      <form id="bookingForm" class="card p-8 space-y-6 animate-fade-in-up">
 
+        <!-- Name -->
         <div>
           <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Full Name</label>
           <input type="text" name="name" required placeholder="Your full name" class="input-base" />
         </div>
 
+        <!-- Email -->
         <div>
           <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Email</label>
           <input type="email" name="email" required placeholder="you@example.com" class="input-base" />
         </div>
 
+        <!-- Service -->
         <div>
           <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Service</label>
           <select name="serviceId" required class="input-base" id="serviceSelect">
@@ -58,11 +68,12 @@
           </select>
         </div>
 
-        <!-- Birth info — only shown for astrology sessions -->
+        <!-- Birth info — only for astrology sessions -->
         <div id="birthInfoSection" style="display:none;" class="space-y-4">
-          <div class="rounded-lg p-3" style="background:rgba(100,80,180,0.08); border:1px solid rgba(100,80,180,0.2);">
+          <div class="rounded-lg p-3" style="background:rgba(100,80,180,0.08);border:1px solid rgba(100,80,180,0.2);">
             <p class="font-body text-xs leading-relaxed" style="color:var(--muted)">
-              ✦ This session uses your natal chart. Please provide your birth details as accurately as possible. If your exact birth time is unknown, Heather will cast an Aries Rising chart using your birth date and location.
+              ✦ This session uses your natal chart. Please provide your birth details as accurately as possible.
+              If your exact birth time is unknown, Heather will cast an Aries Rising chart using your birth date and location.
             </p>
           </div>
           <div>
@@ -83,17 +94,25 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Preferred Date</label>
-            <input type="date" name="date" required id="dateInput" class="input-base" />
-          </div>
-          <div>
-            <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Preferred Time</label>
-            <input type="time" name="time" required class="input-base" />
-          </div>
+        <!-- Date picker -->
+        <div>
+          <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Preferred Date</label>
+          <input type="date" name="date" required id="dateInput" class="input-base" />
+          <p class="mt-1 font-body text-xs" style="color:var(--muted)">Sessions available Monday – Friday only.</p>
         </div>
 
+        <!-- Time slot grid -->
+        <div>
+          <label class="mb-2 block font-body text-sm font-medium" style="color:var(--fg)">Preferred Time</label>
+          <input type="hidden" name="time" id="timeHidden" required />
+
+          <div id="slotsContainer">
+            <p class="font-body text-sm" style="color:var(--muted)">← Select a date to see available times.</p>
+          </div>
+          <p id="slotsMsg" class="mt-2 font-body text-xs" style="color:var(--muted);display:none;"></p>
+        </div>
+
+        <!-- Format -->
         <div>
           <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">Session Format</label>
           <select name="format" class="input-base">
@@ -102,18 +121,43 @@
           </select>
         </div>
 
+        <!-- Notes -->
         <div>
           <label class="mb-1.5 block font-body text-sm font-medium" style="color:var(--fg)">
             Notes <span class="font-normal" style="color:var(--muted)">(optional)</span>
           </label>
-          <textarea name="notes" rows="3" placeholder="A question you're sitting with, a situation you'd like to explore..." class="input-base"></textarea>
+          <textarea name="notes" rows="3"
+                    placeholder="A question you're sitting with, a situation you'd like to explore..."
+                    class="input-base"></textarea>
         </div>
 
         <!-- Price summary -->
-        <div id="priceSummary" style="display:none; background:rgba(201,146,42,0.08); border:1px solid rgba(201,146,42,0.2);" class="rounded-lg p-4">
+        <div id="priceSummary" style="display:none;background:rgba(201,146,42,0.08);border:1px solid rgba(201,146,42,0.2);" class="rounded-lg p-4">
           <p class="font-body text-sm" style="color:var(--muted)">Session total</p>
           <p class="font-display text-2xl font-bold" style="color:var(--primary)" id="priceDisplay"></p>
-          <p class="mt-1 font-body text-xs" style="color:var(--muted)">Full payment required at booking. 24-hour notice required to reschedule. One reschedule per booking. Missed appointments are non-refundable.</p>
+        </div>
+
+        <!-- CANCELLATION POLICY BOX -->
+        <div class="rounded-xl p-5 space-y-3" style="background:rgba(110,77,153,0.08);border:1px solid rgba(110,77,153,0.25);">
+          <p class="font-body text-xs font-semibold uppercase tracking-widest" style="color:var(--celestial-light)">✦ Booking & Cancellation Policy</p>
+          <ul class="space-y-2">
+            <li class="flex items-start gap-2 font-body text-sm" style="color:var(--muted)">
+              <span style="color:var(--primary);flex-shrink:0;">💳</span>
+              <span><strong style="color:var(--fg)">Full payment</strong> is required at the time of booking. Sessions are not confirmed until payment is received.</span>
+            </li>
+            <li class="flex items-start gap-2 font-body text-sm" style="color:var(--muted)">
+              <span style="color:var(--primary);flex-shrink:0;">🕐</span>
+              <span><strong style="color:var(--fg)">24-hour notice</strong> is required to reschedule. Requests made less than 24 hours before your session cannot be accommodated.</span>
+            </li>
+            <li class="flex items-start gap-2 font-body text-sm" style="color:var(--muted)">
+              <span style="color:var(--primary);flex-shrink:0;">🔁</span>
+              <span><strong style="color:var(--fg)">One reschedule</strong> is allowed per booking. After that, the session is forfeited.</span>
+            </li>
+            <li class="flex items-start gap-2 font-body text-sm" style="color:var(--muted)">
+              <span style="color:var(--primary);flex-shrink:0;">🚫</span>
+              <span><strong style="color:var(--fg)">Missed appointments are non-refundable.</strong> Please arrive on time and in a quiet space where you can be fully present.</span>
+            </li>
+          </ul>
         </div>
 
         <button type="submit" id="submitBtn" class="btn-gold w-full py-3.5">Review Booking ✦</button>
@@ -123,20 +167,41 @@
     <!-- STEP 2: Review & Confirm -->
     <div id="reviewStep" style="display:none;" class="animate-fade-in-up">
       <div class="card p-8 space-y-6">
-        <div class="text-center pb-2" style="border-bottom:1px solid var(--border)">
+        <div class="text-center pb-4" style="border-bottom:1px solid var(--border)">
           <div class="text-3xl mb-2">🔮</div>
           <h2 class="font-display text-2xl font-bold" style="color:var(--fg)">Review Your Booking</h2>
           <p class="font-body text-sm mt-1" style="color:var(--muted)">Please confirm everything looks correct before we lock in your session.</p>
         </div>
 
-        <!-- Summary rows -->
         <div class="space-y-3" id="reviewRows"></div>
 
-        <!-- Cancellation policy reminder -->
-        <div class="rounded-lg p-4" style="background:rgba(110,77,153,0.08);border:1px solid rgba(110,77,153,0.2);">
-          <p class="font-body text-xs leading-relaxed" style="color:var(--muted)">
-            ✦ <strong style="color:var(--fg)">Cancellation Policy:</strong> 24-hour notice required to reschedule. One reschedule allowed per booking. Missed appointments are non-refundable. Full payment is due at the time of booking.
-          </p>
+        <!-- POLICY ACKNOWLEDGEMENT — must tick before confirming -->
+        <div class="rounded-xl p-5 space-y-3" style="background:rgba(110,77,153,0.08);border:1px solid rgba(110,77,153,0.25);">
+          <p class="font-body text-xs font-semibold uppercase tracking-widest" style="color:var(--celestial-light)">✦ Please Read & Acknowledge</p>
+          <ul class="space-y-2 mb-4">
+            <li class="flex items-start gap-2 font-body text-sm" style="color:var(--muted)">
+              <span style="color:var(--primary);flex-shrink:0;">💳</span>
+              <span><strong style="color:var(--fg)">Full payment</strong> is required at the time of booking.</span>
+            </li>
+            <li class="flex items-start gap-2 font-body text-sm" style="color:var(--muted)">
+              <span style="color:var(--primary);flex-shrink:0;">🕐</span>
+              <span><strong style="color:var(--fg)">24-hour notice</strong> required to reschedule.</span>
+            </li>
+            <li class="flex items-start gap-2 font-body text-sm" style="color:var(--muted)">
+              <span style="color:var(--primary);flex-shrink:0;">🔁</span>
+              <span><strong style="color:var(--fg)">One reschedule</strong> allowed per booking.</span>
+            </li>
+            <li class="flex items-start gap-2 font-body text-sm" style="color:var(--muted)">
+              <span style="color:var(--primary);flex-shrink:0;">🚫</span>
+              <span><strong style="color:var(--fg)">Missed appointments are non-refundable.</strong></span>
+            </li>
+          </ul>
+          <label class="flex items-start gap-3 cursor-pointer group">
+            <input type="checkbox" id="policyAgree" class="mt-0.5 flex-shrink-0" style="accent-color:var(--primary);width:16px;height:16px;cursor:pointer;">
+            <span class="font-body text-sm leading-relaxed" style="color:var(--muted)">
+              I have read and agree to the booking, cancellation, and payment policy above. I understand that missed appointments are non-refundable and that only one reschedule is permitted per booking.
+            </span>
+          </label>
         </div>
 
         <div class="flex flex-col gap-3 sm:flex-row">
@@ -146,7 +211,8 @@
                   onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
             ← Edit Details
           </button>
-          <button id="confirmBtn" class="flex-1 btn-gold py-3">Confirm & Book Session ✨</button>
+          <button id="confirmBtn" class="flex-1 btn-gold py-3" disabled
+                  style="opacity:0.5;cursor:not-allowed;">Confirm & Book Session ✨</button>
         </div>
       </div>
     </div>
@@ -157,52 +223,108 @@
 {% endblock %}
 {% block scripts %}
 <script>
-  document.getElementById('dateInput').min = new Date().toISOString().split('T')[0];
+  // ── Date constraints
+  const dateInput = document.getElementById('dateInput');
+  dateInput.min = new Date().toISOString().split('T')[0];
 
-  const serviceSelect  = document.getElementById('serviceSelect');
-  const birthSection   = document.getElementById('birthInfoSection');
-  const priceSummary   = document.getElementById('priceSummary');
-  const priceDisplay   = document.getElementById('priceDisplay');
+  // ── Service change
+  const serviceSelect = document.getElementById('serviceSelect');
+  const birthSection  = document.getElementById('birthInfoSection');
+  const priceSummary  = document.getElementById('priceSummary');
+  const priceDisplay  = document.getElementById('priceDisplay');
 
   function onServiceChange() {
     const opt = serviceSelect.options[serviceSelect.selectedIndex];
-    const requiresBirth = opt.dataset && opt.dataset.requiresBirth === 'true';
-    const price = opt.dataset && opt.dataset.price;
-    birthSection.style.display = requiresBirth ? 'block' : 'none';
-    if (price) {
-      priceDisplay.textContent = '$' + parseFloat(price).toFixed(2);
+    birthSection.style.display  = opt.dataset.requiresBirth === 'true' ? 'block' : 'none';
+    if (opt.dataset.price) {
+      priceDisplay.textContent  = '$' + parseFloat(opt.dataset.price).toFixed(2);
       priceSummary.style.display = 'block';
     } else {
       priceSummary.style.display = 'none';
     }
   }
-
   serviceSelect.addEventListener('change', onServiceChange);
   if (serviceSelect.value) onServiceChange();
 
-  // ── Collect form data
-  function collectFormData() {
-    const fd = new FormData(document.getElementById('bookingForm'));
-    return Object.fromEntries(fd.entries());
-  }
+  // ── Time slot loader
+  let selectedTime = '';
+  const slotsContainer = document.getElementById('slotsContainer');
+  const slotsMsg       = document.getElementById('slotsMsg');
+  const timeHidden     = document.getElementById('timeHidden');
 
-  // ── STEP 1 → STEP 2: validate with server, show review
-  document.getElementById('bookingForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true; btn.textContent = 'Checking availability…';
+  async function loadSlots(date) {
+    selectedTime = '';
+    timeHidden.value = '';
+    slotsContainer.innerHTML = '<p class="font-body text-sm" style="color:var(--muted)">Checking availability…</p>';
+    slotsMsg.style.display = 'none';
 
-    const payload = collectFormData();
-    const { ok, data } = await api.post('/api/booking/preview', payload);
-
-    btn.disabled = false; btn.textContent = 'Review Booking ✦';
-
+    const { ok, data } = await api.get(`/api/booking/slots?date=${date}`);
     if (!ok) {
-      showToast(data.error || 'Please check your details and try again.', 'error');
+      slotsContainer.innerHTML = '<p class="font-body text-sm" style="color:var(--muted)">Could not load slots. Please try again.</p>';
       return;
     }
 
-    // Build review rows
+    if (data.message) {
+      slotsContainer.innerHTML = `<p class="font-body text-sm" style="color:var(--muted)">${data.message}</p>`;
+      return;
+    }
+
+    if (!data.slots || !data.slots.length) {
+      slotsContainer.innerHTML = '<p class="font-body text-sm" style="color:var(--muted)">No slots available for this date.</p>';
+      return;
+    }
+
+    slotsContainer.innerHTML = `
+      <div class="grid grid-cols-3 gap-2" id="slotGrid"></div>`;
+
+    const grid = document.getElementById('slotGrid');
+    data.slots.forEach(slot => {
+      const btn = document.createElement('button');
+      btn.type         = 'button';
+      btn.textContent  = formatTime(slot.time);
+      btn.dataset.time = slot.time;
+      // Every slot returned by the API is already confirmed available
+      btn.style.cssText = `font-family:var(--font-body);font-size:.8rem;font-weight:500;
+        border-radius:.5rem;padding:.5rem .25rem;cursor:pointer;transition:all .15s;border:1px solid;
+        background:transparent;border-color:var(--border);color:var(--muted);`;
+      btn.addEventListener('click', () => selectSlot(slot.time, btn));
+      grid.appendChild(btn);
+    });
+  }
+
+  function selectSlot(time, btn) {
+    // Reset all slot buttons
+    document.querySelectorAll('#slotGrid button:not(:disabled)').forEach(b => {
+      b.style.background   = 'transparent';
+      b.style.borderColor  = 'var(--border)';
+      b.style.color        = 'var(--muted)';
+    });
+    // Highlight selected
+    btn.style.background  = 'var(--primary)';
+    btn.style.borderColor = 'var(--primary)';
+    btn.style.color       = '#0e0f1a';
+    selectedTime          = time;
+    timeHidden.value      = time;
+  }
+
+  dateInput.addEventListener('change', () => {
+    if (dateInput.value) loadSlots(dateInput.value);
+  });
+
+  // ── Step 1 → Step 2
+  document.getElementById('bookingForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!timeHidden.value) { showToast('Please select a time slot.', 'error'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true; btn.textContent = 'Checking availability…';
+
+    const payload = Object.fromEntries(new FormData(e.target));
+    const { ok, data } = await api.post('/api/booking/preview', payload);
+    btn.disabled = false; btn.textContent = 'Review Booking ✦';
+
+    if (!ok) { showToast(data.error || 'Please check your details and try again.', 'error'); return; }
+
     const s = data.summary;
     const rows = [
       ['Session',  s.serviceName],
@@ -227,46 +349,57 @@
         <span class="font-body text-sm font-medium text-right flex-1" style="color:var(--fg)">${val}</span>
       </div>`).join('');
 
-    // Stash summary for confirm step
     document.getElementById('confirmBtn').dataset.summary = JSON.stringify(s);
 
-    // Switch steps
+    // Switch to step 2
     document.getElementById('formStep').style.display   = 'none';
     document.getElementById('reviewStep').style.display = 'block';
-    document.getElementById('step2dot').style.background  = 'var(--primary)';
-    document.getElementById('step2dot').style.color       = '#0e0f1a';
-    document.getElementById('step2label').style.color     = 'var(--primary)';
+    document.getElementById('step2dot').style.background = 'var(--primary)';
+    document.getElementById('step2dot').style.color      = '#0e0f1a';
+    document.getElementById('step2label').style.color    = 'var(--primary)';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   // ── Back to Step 1
   document.getElementById('backBtn').addEventListener('click', () => {
     document.getElementById('reviewStep').style.display  = 'none';
+    // Reset policy checkbox so client must re-acknowledge if they edit details
+    const cb = document.getElementById('policyAgree');
+    const cfBtn = document.getElementById('confirmBtn');
+    cb.checked = false;
+    cfBtn.disabled = true;
+    cfBtn.style.opacity = '0.5';
+    cfBtn.style.cursor = 'not-allowed';
     document.getElementById('formStep').style.display    = 'block';
     document.getElementById('step2dot').style.background = 'var(--border)';
     document.getElementById('step2dot').style.color      = 'var(--muted)';
     document.getElementById('step2label').style.color    = 'var(--muted)';
   });
 
-  // ── STEP 2 → Confirm: write to DB
+  // ── Step 2 → Confirm
+  // Enable confirm button only when policy checkbox is ticked
+  document.getElementById('policyAgree').addEventListener('change', function() {
+    const btn = document.getElementById('confirmBtn');
+    if (this.checked) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+    } else {
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.style.cursor = 'not-allowed';
+    }
+  });
+
   document.getElementById('confirmBtn').addEventListener('click', async () => {
     const btn = document.getElementById('confirmBtn');
     btn.disabled = true; btn.textContent = 'Confirming your session…';
-
-    const summary  = JSON.parse(btn.dataset.summary || '{}');
+    const s = JSON.parse(btn.dataset.summary || '{}');
     const { ok, data } = await api.post('/api/booking/confirm', {
-      name:          summary.name,
-      email:         summary.email,
-      serviceId:     summary.serviceId,
-      date:          summary.date,
-      time:          summary.time,
-      format:        summary.format,
-      notes:         summary.notes,
-      birthDate:     summary.birthDate,
-      birthTime:     summary.birthTime,
-      birthLocation: summary.birthLocation,
+      name: s.name, email: s.email, serviceId: s.serviceId,
+      date: s.date, time: s.time, format: s.format, notes: s.notes,
+      birthDate: s.birthDate, birthTime: s.birthTime, birthLocation: s.birthLocation,
     });
-
     if (ok) {
       window.location.href = '/booking/success?id=' + data.bookingId;
     } else {

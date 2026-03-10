@@ -4,6 +4,15 @@ from datetime import datetime, timedelta
 import uuid
 import os
 import re
+from dotenv import load_dotenv
+load_dotenv()
+
+from email_service import (
+    start_scheduler, stop_scheduler,
+    send_booking_confirmation,
+    schedule_booking_emails,
+    cancel_booking_emails,
+)
 
 app = Flask(__name__)
 app.secret_key = "celestial-secret-key-change-in-production"
@@ -14,11 +23,29 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+# ─────────────────────────────────────────────
+# Start background email scheduler
+# ─────────────────────────────────────────────
+import atexit
+start_scheduler()
+atexit.register(stop_scheduler)
+
+# ─────────────────────────────────────────────
+# Available booking time slots
+# ─────────────────────────────────────────────
+AVAILABLE_SLOTS = [
+    "09:00", "10:00", "11:00", "12:00",
+    "13:00", "14:00", "15:00", "16:00", "17:00",
+]
+AVAILABLE_DAYS = [0, 1, 2, 3, 4]  # Mon–Fri (0=Mon, 6=Sun)
+
 ADMIN_EMAIL    = "admin@celestialgoodnessastrology.com"
 ADMIN_PASSWORD = "admin123"
 
 
-
+# ─────────────────────────────────────────────
+# Models
+# ─────────────────────────────────────────────
 
 class Service(db.Model):
     __tablename__ = "services"
@@ -63,9 +90,11 @@ class Booking(db.Model):
     birth_date     = db.Column(db.String(20),  default="")
     birth_time     = db.Column(db.String(10),  default="")
     birth_location = db.Column(db.String(200), default="")
-    payment_status = db.Column(db.String(20),  default="pending")
-    status         = db.Column(db.String(20),  default="upcoming")
-    created_at     = db.Column(db.DateTime,    default=datetime.utcnow)
+    payment_status    = db.Column(db.String(20),  default="pending")
+    status            = db.Column(db.String(20),  default="upcoming")
+    zoom_link         = db.Column(db.String(500), default="")
+    reschedule_count  = db.Column(db.Integer,     default=0)
+    created_at        = db.Column(db.DateTime,    default=datetime.utcnow)
 
     def to_dict(self):
         return {
@@ -84,6 +113,8 @@ class Booking(db.Model):
             "birthLocation": self.birth_location,
             "paymentStatus": self.payment_status,
             "status":        self.status,
+            "zoomLink":      self.zoom_link or "",
+            "rescheduleCount": self.reschedule_count or 0,
             "createdAt":     self.created_at.isoformat() + "Z",
         }
 
@@ -172,12 +203,32 @@ class BlogPost(db.Model):
         }
 
 
+# ─────────────────────────────────────────────
+# Helpers
+# ─────────────────────────────────────────────
 
 def is_admin():
     return session.get("admin") is True
 
 def valid_email(email):
     return re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email) is not None
+
+def _next_booking_id():
+    """Generate the next sequential booking ID in the format CG-YYYY-NNN.
+    Finds the highest existing number for the current year and increments it.
+    """
+    year   = datetime.utcnow().year
+    prefix = f"CG-{year}-"
+    existing = Booking.query.filter(Booking.id.like(f"{prefix}%")).all()
+    max_num  = 0
+    for b in existing:
+        try:
+            num = int(b.id.replace(prefix, ""))
+            if num > max_num:
+                max_num = num
+        except ValueError:
+            pass
+    return f"{prefix}{str(max_num + 1).zfill(3)}"
 
 def slot_is_taken(date, time, exclude_id=None):
     """Return True if date+time slot already has an upcoming booking."""
@@ -192,9 +243,12 @@ def date_is_in_past(date_str):
         d = datetime.strptime(date_str, "%Y-%m-%d").date()
         return d < datetime.utcnow().date()
     except ValueError:
-        return True
+        return True   # treat unparseable dates as invalid
 
 
+# ─────────────────────────────────────────────
+# Seed
+# ─────────────────────────────────────────────
 
 def seed_services():
     if Service.query.count():
@@ -228,15 +282,15 @@ def seed_services():
     db.session.add_all(rows)
 
     bookings = [
-        Booking(id="BK-001", client_name="Sample Client",   email="sample@example.com",
+        Booking(id="CG-2026-001", client_name="Sample Client",   email="sample@example.com",
                 service_id="2",  service_name="The Celestial Blueprint Consultation",
                 price=155.50, date="2026-03-10", time="10:00", payment_status="paid", status="upcoming",
                 created_at=datetime(2026, 3, 1, 10, 30)),
-        Booking(id="BK-002", client_name="Sample Client 2", email="sample2@example.com",
+        Booking(id="CG-2026-002", client_name="Sample Client 2", email="sample2@example.com",
                 service_id="3",  service_name="The Celestial Sovereignty Session",
                 price=222.00, date="2026-03-12", time="14:00", payment_status="paid", status="upcoming",
                 created_at=datetime(2026, 3, 2, 8, 15)),
-        Booking(id="BK-003", client_name="Sample Client 3", email="sample3@example.com",
+        Booking(id="CG-2026-003", client_name="Sample Client 3", email="sample3@example.com",
                 service_id="1c", service_name="The Celestial Oracle Session — Extended",
                 price=77.77, date="2026-03-05", time="11:00", payment_status="paid", status="completed",
                 created_at=datetime(2026, 2, 28, 16, 45)),
@@ -245,11 +299,17 @@ def seed_services():
     db.session.commit()
 
 
+# ─────────────────────────────────────────────
+# Page Routes
+# ─────────────────────────────────────────────
 
 @app.route("/")
 def index():
-    services = Service.query.limit(3).all()
-    return render_template("index.html", services=[s.to_dict() for s in services])
+    services     = Service.query.limit(3).all()
+    testimonials = Testimonial.query.filter_by(approved=True).order_by(Testimonial.created_at.desc()).limit(3).all()
+    return render_template("index.html",
+                           services=[s.to_dict() for s in services],
+                           testimonials=[t.to_dict() for t in testimonials])
 
 @app.route("/about")
 def about():
@@ -283,6 +343,11 @@ def testimonials():
 def contact():
     return render_template("contact.html")
 
+
+@app.route("/ethics")
+def ethics():
+    return render_template("ethics.html")
+
 @app.route("/admin")
 def admin_login():
     return render_template("admin_login.html")
@@ -298,6 +363,9 @@ def success_fallback():
     return redirect(url_for("index"))
 
 
+# ─────────────────────────────────────────────
+# Booking API  (2-step: preview → confirm)
+# ─────────────────────────────────────────────
 
 @app.route("/api/booking/preview", methods=["POST"])
 def booking_preview():
@@ -325,6 +393,7 @@ def booking_preview():
             "error": "That date and time is already booked. Please choose a different slot."
         }), 409
 
+    # Birth-info validation for astrology sessions
     if service.requires_birth_info and not data.get("birthDate"):
         return jsonify({
             "error": "A date of birth is required for this session type."
@@ -374,7 +443,7 @@ def booking_confirm():
         }), 409
 
     booking = Booking(
-        id             = f"BK-{str(uuid.uuid4())[:6].upper()}",
+        id             = _next_booking_id(),
         client_name    = data["name"].strip(),
         email          = data["email"].strip(),
         service_id     = service.id,
@@ -392,9 +461,34 @@ def booking_confirm():
     )
     db.session.add(booking)
     db.session.commit()
+
+    # ── Email sequences ──────────────────────────────
+    # email_service expects snake_case keys (not camelCase from to_dict())
+    svc = db.session.get(Service, booking.service_id)
+    booking_dict = {
+        "id":                  booking.id,
+        "client_name":         booking.client_name,
+        "email":               booking.email,
+        "service_name":        booking.service_name,
+        "date":                booking.date,
+        "time":                booking.time,
+        "zoom_link":           booking.zoom_link or "",
+        "requires_birth_info": svc.requires_birth_info if svc else False,
+        "birth_date":          booking.birth_date,
+        "birth_time":          booking.birth_time,
+        "birth_location":      booking.birth_location,
+    }
+    # Email 1 — send immediately
+    send_booking_confirmation(booking_dict)
+    # Emails 2 & 3 — schedule for 24hr before/after
+    schedule_booking_emails(booking_dict)
+
     return jsonify({"success": True, "bookingId": booking.id}), 201
 
 
+# ─────────────────────────────────────────────
+# Testimonials API (public)
+# ─────────────────────────────────────────────
 
 @app.route("/api/testimonial", methods=["POST"])
 def submit_testimonial():
@@ -415,6 +509,9 @@ def submit_testimonial():
     return jsonify({"success": True}), 201
 
 
+# ─────────────────────────────────────────────
+# Newsletter API (public)
+# ─────────────────────────────────────────────
 
 @app.route("/api/newsletter", methods=["POST"])
 def newsletter():
@@ -429,6 +526,9 @@ def newsletter():
     return jsonify({"success": True}), 200
 
 
+# ─────────────────────────────────────────────
+# Contact API (public)
+# ─────────────────────────────────────────────
 
 @app.route("/api/contact", methods=["POST"])
 def contact_submit():
@@ -445,6 +545,9 @@ def contact_submit():
     return jsonify({"success": True}), 200
 
 
+# ─────────────────────────────────────────────
+# Admin — Auth
+# ─────────────────────────────────────────────
 
 @app.route("/api/admin/login", methods=["POST"])
 def admin_login_api():
@@ -460,6 +563,34 @@ def admin_logout():
     return jsonify({"success": True}), 200
 
 
+@app.route("/api/admin/test-email")
+def test_email():
+    """Quick diagnostic — visit this URL while logged in to send a test email."""
+    if not is_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    api_key    = os.environ.get("SENDGRID_API_KEY", "")
+    from_email = os.environ.get("SENDGRID_FROM_EMAIL", "")
+    result = send_booking_confirmation({
+        "id":            "TEST-001",
+        "client_name":   "Heather (Test)",
+        "email":         from_email or "aguakaolisa2004@gmail.com",
+        "service_name":  "Test Session",
+        "date":          "2026-12-01",
+        "time":          "10:00",
+        "zoom_link":     "https://zoom.us/test",
+        "requires_birth_info": False,
+    })
+    return jsonify({
+        "sent": result,
+        "api_key_set": bool(api_key),
+        "from_email":  from_email,
+        "message":     "Check your inbox and the PyCharm console for logs."
+    })
+
+
+# ─────────────────────────────────────────────
+# Admin — Stats
+# ─────────────────────────────────────────────
 
 @app.route("/api/admin/stats")
 def admin_stats():
@@ -481,6 +612,9 @@ def admin_stats():
     }), 200
 
 
+# ─────────────────────────────────────────────
+# Admin — Bookings
+# ─────────────────────────────────────────────
 
 @app.route("/api/admin/bookings")
 def get_bookings():
@@ -521,11 +655,139 @@ def delete_booking(booking_id):
     b = db.session.get(Booking, booking_id)
     if not b:
         return jsonify({"error": "Not found"}), 404
+    # Cancel any scheduled reminder/integration emails before deleting
+    cancel_booking_emails(b.id)
     db.session.delete(b)
     db.session.commit()
     return jsonify({"success": True}), 200
 
 
+@app.route("/api/admin/bookings/<booking_id>/reschedule", methods=["PATCH"])
+def reschedule_booking(booking_id):
+    if not is_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    b = db.session.get(Booking, booking_id)
+    if not b:
+        return jsonify({"error": "Not found"}), 404
+    if b.reschedule_count >= 1:
+        return jsonify({"error": "This booking has already been rescheduled once. No further reschedules are permitted per policy."}), 400
+    data = request.get_json()
+    new_date = data.get("date", "").strip()
+    new_time = data.get("time", "").strip()
+    if not new_date or not new_time:
+        return jsonify({"error": "New date and time are required."}), 400
+    if date_is_in_past(new_date):
+        return jsonify({"error": "New date cannot be in the past."}), 400
+    if slot_is_taken(new_date, new_time, exclude_id=booking_id):
+        return jsonify({"error": "That slot is already taken. Please choose a different time."}), 409
+    b.date             = new_date
+    b.time             = new_time
+    b.reschedule_count = (b.reschedule_count or 0) + 1
+    db.session.commit()
+    return jsonify({"success": True, "rescheduleCount": b.reschedule_count}), 200
+
+
+@app.route("/api/admin/bookings/<booking_id>/zoom", methods=["PATCH"])
+def set_zoom_link(booking_id):
+    if not is_admin():
+        return jsonify({"error": "Unauthorized"}), 401
+    b = db.session.get(Booking, booking_id)
+    if not b:
+        return jsonify({"error": "Not found"}), 404
+    data = request.get_json()
+    b.zoom_link = data.get("zoomLink", "").strip()
+    db.session.commit()
+    # Re-send confirmation email so client receives their Zoom link
+    if b.zoom_link:
+        svc = db.session.get(Service, b.service_id)
+        booking_for_email = {
+            "id":                  b.id,
+            "client_name":         b.client_name,
+            "email":               b.email,
+            "service_name":        b.service_name,
+            "date":                b.date,
+            "time":                b.time,
+            "zoom_link":           b.zoom_link,
+            "requires_birth_info": svc.requires_birth_info if svc else False,
+            "birth_date":          b.birth_date,
+            "birth_time":          b.birth_time,
+            "birth_location":      b.birth_location,
+        }
+        # Email 1 — resend confirmation with the Zoom link now included
+        send_booking_confirmation(booking_for_email)
+        # Reschedule Email 2 reminder so it also carries the Zoom link
+        # (the original scheduled job had empty zoom_link baked in)
+        schedule_booking_emails(booking_for_email)
+    return jsonify({"success": True}), 200
+
+
+@app.route("/api/booking/slots")
+def get_available_slots():
+    """Return only genuinely available time slots for a given date.
+
+    A slot is excluded (not returned at all) when:
+      1. It has already been booked by another booking (status=upcoming).
+      2. It falls within 1 hour AFTER another booked slot (buffer time).
+      3. It is in the past (for today's date, current hour and earlier are gone).
+      4. The date is a weekend (Mon–Fri only).
+
+    Optional query param `exclude` — a booking ID whose slot should be
+    ignored when computing conflicts.  Used by the reschedule flow so the
+    booking being moved does not block its own current slot.
+    """
+    date_str   = request.args.get("date", "")
+    exclude_id = request.args.get("exclude", None)   # booking ID to ignore
+
+    if not date_str:
+        return jsonify({"error": "date parameter required"}), 400
+    try:
+        chosen = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return jsonify({"error": "Invalid date format"}), 400
+
+    today = datetime.utcnow().date()
+    if chosen < today:
+        return jsonify({"slots": [], "message": "Please choose a future date."}), 200
+
+    # Block weekends
+    if chosen.weekday() not in AVAILABLE_DAYS:
+        return jsonify({"slots": [], "message": "Sessions are available Monday–Friday only."}), 200
+
+    # Collect booked hours — exclude the booking being rescheduled so its
+    # current slot doesn't pollute the available-slot calculation
+    query = Booking.query.filter_by(date=date_str, status="upcoming")
+    if exclude_id:
+        query = query.filter(Booking.id != exclude_id)
+    booked_hours = {int(b.time.split(":")[0]) for b in query.all()}
+
+    # Current hour threshold — for today, slots at or before now are gone
+    now_hour = datetime.utcnow().hour if chosen == today else -1
+
+    available_slots = []
+    for slot in AVAILABLE_SLOTS:
+        slot_hour = int(slot.split(":")[0])
+
+        # Skip past slots (today only)
+        if slot_hour <= now_hour:
+            continue
+
+        # Skip the booked slot itself
+        if slot_hour in booked_hours:
+            continue
+
+        # Skip the 1-hour buffer after any booked slot
+        # e.g. if 10:00 is booked, 11:00 is also blocked
+        if any(slot_hour == booked_h + 1 for booked_h in booked_hours):
+            continue
+
+        available_slots.append({"time": slot})
+
+    return jsonify({"slots": available_slots}), 200
+
+
+# ─────────────────────────────────────────────
+# Admin — Testimonials
+# ─────────────────────────────────────────────
 
 @app.route("/api/admin/testimonials")
 def admin_get_testimonials():
@@ -557,6 +819,9 @@ def delete_testimonial(tid):
     return jsonify({"success": True}), 200
 
 
+# ─────────────────────────────────────────────
+# Admin — Contacts
+# ─────────────────────────────────────────────
 
 @app.route("/api/admin/contacts")
 def admin_get_contacts():
@@ -580,6 +845,9 @@ def delete_contact(cid):
     return jsonify({"success": True}), 200
 
 
+# ─────────────────────────────────────────────
+# Admin — Subscribers
+# ─────────────────────────────────────────────
 
 @app.route("/api/admin/subscribers")
 def admin_get_subscribers():
@@ -589,7 +857,9 @@ def admin_get_subscribers():
     return jsonify([s.to_dict() for s in items]), 200
 
 
-
+# ─────────────────────────────────────────────
+# Admin — Blog
+# ─────────────────────────────────────────────
 
 @app.route("/api/admin/blog")
 def admin_get_blog():
@@ -645,7 +915,9 @@ def admin_delete_post(pid):
     return jsonify({"success": True}), 200
 
 
-
+# ─────────────────────────────────────────────
+# Entry point
+# ─────────────────────────────────────────────
 
 def check_and_migrate():
     """
@@ -661,7 +933,7 @@ def check_and_migrate():
         "contacts":    {"id","name","email","message","read","created_at"},
         "bookings":    {"id","client_name","email","service_id","service_name","price",
                         "date","time","format","notes","birth_date","birth_time",
-                        "birth_location","payment_status","status","created_at"},
+                        "birth_location","payment_status","status","zoom_link","reschedule_count","created_at"},
         "testimonials":{"id","name","text","rating","service","approved","created_at"},
         "blog_posts":  {"id","title","category","excerpt","body","published",
                         "created_at","updated_at"},
@@ -692,8 +964,8 @@ def check_and_migrate():
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()
-        check_and_migrate()
-        seed_services()
+        db.create_all()        # create any brand-new tables
+        check_and_migrate()    # detect & fix schema drift (missing columns etc.)
+        seed_services()        # seed only if tables are empty
     app.run(debug=True, port=5000)
 

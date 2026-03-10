@@ -3,7 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Celestial Goodness Astrology & Tarot{% endblock %}</title>
+
+  <!-- ══ SEO: Primary Meta Tags ══ -->
+  <title>{% block title %}Celestial Goodness Astrology & Tarot | Heather Wiggins{% endblock %}</title>
+  <meta name="title" content="{% block meta_title %}Celestial Goodness Astrology & Tarot | Heather Wiggins{% endblock %}" />
+  <meta name="description" content="{% block meta_description %}Celestial Goodness Astrology & Tarot offers personalized astrology readings, tarot consultations, and oracle card sessions with Heather Wiggins — guiding women toward self-discovery, empowerment, and alignment with the cosmos.{% endblock %}" />
+  <meta name="keywords" content="{% block meta_keywords %}astrology readings, tarot readings, oracle card readings, birth chart consultation, celestial blueprint, spiritual guidance, women empowerment, personal growth, Heather Wiggins, Celestial Goodness{% endblock %}" />
+  <meta name="author" content="Heather Wiggins — Celestial Goodness Astrology & Tarot" />
+  <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}" />
+  <link rel="canonical" href="https://www.celestialgoodnessastrology.com{{ request.path }}" />
+
+  <!-- ══ SEO: Open Graph / Facebook ══ -->
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+  <meta property="og:url" content="https://www.celestialgoodnessastrology.com{{ request.path }}" />
+  <meta property="og:site_name" content="Celestial Goodness Astrology & Tarot" />
+  <meta property="og:title" content="{% block og_title %}Celestial Goodness Astrology & Tarot | Heather Wiggins{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}Personalized astrology, tarot, and oracle card readings to guide your journey of self-discovery and cosmic alignment.{% endblock %}" />
+  <meta property="og:image" content="{% block og_image %}https://www.celestialgoodnessastrology.com/static/images/og-preview.jpg{% endblock %}" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- ══ SEO: Twitter Card ══ -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://www.celestialgoodnessastrology.com{{ request.path }}" />
+  <meta name="twitter:title" content="{% block twitter_title %}Celestial Goodness Astrology & Tarot | Heather Wiggins{% endblock %}" />
+  <meta name="twitter:description" content="{% block twitter_description %}Personalized astrology, tarot, and oracle card readings to guide your journey of self-discovery and cosmic alignment.{% endblock %}" />
+  <meta name="twitter:image" content="{% block twitter_image %}https://www.celestialgoodnessastrology.com/static/images/og-preview.jpg{% endblock %}" />
+
+  <!-- ══ SEO: Schema.org Structured Data ══ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Celestial Goodness Astrology & Tarot",
+    "description": "Personalized astrology readings, tarot consultations, and oracle card sessions with Heather Wiggins — guiding women toward self-discovery, empowerment, and alignment with the cosmos.",
+    "url": "https://www.celestialgoodnessastrology.com",
+    "telephone": "(608)215-8837",
+    "email": "Celestialgoodness1111@gmail.com",
+    "founder": {
+      "@type": "Person",
+      "name": "Heather Wiggins",
+      "jobTitle": "Astrologer & Tarot Reader"
+    },
+    "serviceType": ["Astrology Readings", "Tarot Readings", "Oracle Card Readings", "Birth Chart Consultations"],
+    "sameAs": [
+      "https://www.youtube.com/@Celestialgoodness1111"
+    ]
+  }
+  </script>
 
   <!-- Tailwind CDN (utility classes) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -89,8 +135,7 @@
           <a href="#" class="transition-colors hover:text-[#c9922a]" style="color:var(--muted)" aria-label="Instagram">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="currentColor"/></svg>
           </a>
-          <!-- YouTube — link to be updated with Heather's channel URL -->
-          <a href="#" class="transition-colors hover:text-[#c9922a]" style="color:var(--muted)" aria-label="YouTube">
+          <a href="https://www.youtube.com/@Celestialgoodness1111" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-[#c9922a]" style="color:var(--muted)" aria-label="YouTube — Celestial Goodness">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></svg>
           </a>
           <a href="/cdn-cgi/l/email-protection#90f8f5fcfcffd0f3f5fcf5e3e4f9f1fcf7fffff4fef5e3e3f1e3e4e2fffcfff7e9bef3fffd" class="transition-colors hover:text-[#c9922a]" style="color:var(--muted)" aria-label="Email">

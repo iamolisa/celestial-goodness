@@ -1,5 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Contact Heather -- Celestial Goodness Astrology and Tarot{% endblock %}
+{% block title %}Contact Heather Wiggins — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block meta_title %}Contact Heather Wiggins — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block meta_description %}Get in touch with Heather Wiggins at Celestial Goodness Astrology & Tarot. Ask questions, learn more about services, or send a message to start your cosmic journey.{% endblock %}
+{% block meta_keywords %}contact astrologer, reach Heather Wiggins, astrology questions, tarot inquiry, Celestial Goodness contact{% endblock %}
+{% block og_title %}Contact Heather — Celestial Goodness Astrology & Tarot{% endblock %}
+{% block og_description %}Reach out to Heather Wiggins with questions about astrology, tarot, or to learn more about Celestial Goodness services.{% endblock %}
 {% block body %}
 <section class="bg-gradient-hero star-field pb-16 pt-32">
   <div class="max-w-4xl mx-auto px-4 text-center">
@@ -11,6 +16,12 @@
 <section class="py-20">
   <div class="max-w-5xl mx-auto px-4 grid gap-16 md:grid-cols-[1fr_2fr] items-start">
     <div class="space-y-8 pt-2">
+      <!-- Heather's photo -->
+      <div class="rounded-2xl overflow-hidden js-reveal" style="border:1px solid var(--border)">
+        <img src="{{ url_for('static', filename='images/heather-cafe.jpeg') }}"
+             alt="Heather Wiggins — Celestial Goodness Astrologer & Tarot Reader"
+             class="w-full object-cover object-top" style="max-height:320px;" />
+      </div>
       <div class="flex items-start gap-4 js-reveal">
         <span class="mt-1 text-xl" style="color:var(--primary);">&#10022;</span>
         <div>

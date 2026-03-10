@@ -79,21 +79,36 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Star Field ── */
 .star-field {
-  background-image:
-    radial-gradient(2px 2px at 20px  30px, rgba(255, 244, 179, 0.60), transparent),
-    radial-gradient(2px 2px at 40px  70px, rgba(255, 244, 179, 0.40), transparent),
-    radial-gradient(1px 1px at 90px  40px, rgba(255, 244, 179, 0.50), transparent),
-    radial-gradient(1px 1px at 130px 80px, rgba(255, 244, 179, 0.30), transparent),
-    radial-gradient(2px 2px at 160px 30px, rgba(255, 244, 179, 0.50), transparent),
-    radial-gradient(1px 1px at 200px 60px, rgba(255, 244, 179, 0.40), transparent);
-  background-size: 240px 100px;
-  background-repeat: repeat;
+  /* Stars are rendered by the canvas layer injected via main.js */
+  position: relative;
+}
+
+/* Canvas star layer sits behind all content */
+.star-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.star-field > *:not(.star-canvas) {
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Glow on Hover ── */
 .glow-gold { box-shadow: var(--shadow-glow); }
 
 /* ── Animations ── */
+
+@keyframes starDrift {
+  0%   { transform: translateY(0)   translateX(0);   opacity: 0;   }
+  10%  {                                              opacity: 1;   }
+  90%  {                                              opacity: 0.6; }
+  100% { transform: translateY(-100vh) translateX(30px); opacity: 0; }
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(-12px); }
