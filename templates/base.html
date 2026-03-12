@@ -83,7 +83,7 @@
 
     <div class="hidden md:flex items-center gap-8">
       {% set cur = request.path %}
-      {% for label, path in [('Home','/'),('About','/about'),('Services','/services'),('Book Now','/booking'),('Contact','/contact')] %}
+      {% for label, path in [('Home','/'),('About','/about'),('Services','/services'),('Book Now','/booking'),('Blog','/blog'),('Contact','/contact')] %}
         <a href="{{ path }}" class="font-body text-sm tracking-wide transition-colors hover:text-[#c9922a]"
            style="color:{{ 'var(--primary)' if cur == path else 'var(--muted)' }}">{{ label }}</a>
       {% endfor %}
@@ -97,7 +97,7 @@
 
   <div id="mobileMenu" aria-hidden="true" style="background:var(--bg); border-bottom:1px solid var(--border);">
     <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col gap-4">
-      {% for label, path in [('Home','/'),('About','/about'),('Services','/services'),('Book Now','/booking'),('Contact','/contact')] %}
+      {% for label, path in [('Home','/'),('About','/about'),('Services','/services'),('Book Now','/booking'),('Blog','/blog'),('Contact','/contact')] %}
         <a href="{{ path }}" class="font-body text-lg transition-colors hover:text-[#c9922a]"
            style="color:{{ 'var(--primary)' if request.path == path else 'var(--muted)' }}">{{ label }}</a>
       {% endfor %}

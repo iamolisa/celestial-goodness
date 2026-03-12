@@ -13,69 +13,122 @@
     <span class="mb-3 inline-block font-body text-xs font-semibold uppercase tracking-[.3em]" style="color:var(--primary)">✦ Written by Heather ✦</span>
     <h1 class="font-display text-5xl font-bold" style="color:var(--fg)">Celestial Insights</h1>
     <p class="mt-4 font-body text-base max-w-xl mx-auto" style="color:var(--muted)">
-      Astrology, tarot, and the sacred wisdom that shapes our inner world. Writings to illuminate your path.
+      Astrology, tarot, and the sacred wisdom that shapes our inner world — writings to illuminate your path.
     </p>
   </div>
 </section>
 
-<!-- CATEGORY FILTER -->
-<section class="py-8" style="border-bottom:1px solid var(--border);">
-  <div class="max-w-6xl mx-auto px-4 flex flex-wrap gap-3 justify-center">
-    <a href="/blog"
-       class="font-body text-xs font-semibold uppercase tracking-widest px-4 py-2 rounded-full transition-all"
-       style="{{ 'background:var(--primary);color:#0e0f1a;' if not active_category else 'border:1px solid var(--border);color:var(--muted);' }}">
-      All Posts
-    </a>
-    {% for cat in categories %}
-    <a href="/blog?category={{ cat }}"
-       class="font-body text-xs font-semibold uppercase tracking-widest px-4 py-2 rounded-full transition-all"
-       style="{{ 'background:var(--primary);color:#0e0f1a;' if active_category == cat else 'border:1px solid var(--border);color:var(--muted);' }}">
-      {{ cat }}
-    </a>
-    {% endfor %}
+<!-- ORIGINAL BLOG BANNER -->
+<section class="py-6" style="background:rgba(201,146,42,0.07); border-bottom:1px solid rgba(201,146,42,0.2);">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span style="color:var(--primary); font-size:1.4rem;">✦</span>
+        <div>
+          <p class="font-display text-base font-semibold" style="color:var(--fg);">
+            Heather's full blog lives at
+            <a href="{{ blog_url }}" target="_blank" rel="noopener"
+               class="transition-colors hover:opacity-80" style="color:var(--primary);">
+              celestialgoodness.com
+            </a>
+          </p>
+          <p class="font-body text-xs mt-0.5" style="color:var(--muted);">
+            Showing the latest posts below — click any to read the full article there.
+          </p>
+        </div>
+      </div>
+      <a href="{{ blog_url }}" target="_blank" rel="noopener"
+         class="btn-gold px-6 py-2 text-sm whitespace-nowrap">
+        Visit Full Blog ↗
+      </a>
+    </div>
   </div>
 </section>
 
 <!-- POSTS GRID -->
 <section class="py-20">
   <div class="max-w-6xl mx-auto px-4">
-    {% if posts %}
+
+    {% if feed_error %}
+    <div class="text-center py-12 js-reveal">
+      <div class="card max-w-lg mx-auto p-10">
+        <div class="text-4xl mb-4" style="color:var(--primary)">✦</div>
+        <p class="font-display text-2xl font-bold mb-3" style="color:var(--fg);">Read Heather's Blog</p>
+        <p class="font-body text-sm mb-6" style="color:var(--muted);">
+          Cosmic insights, tarot wisdom, and spiritual reflections — all on Heather's dedicated blog.
+        </p>
+        <a href="{{ blog_url }}" target="_blank" rel="noopener" class="btn-gold px-8 py-3">
+          Visit celestialgoodness.com ↗
+        </a>
+      </div>
+    </div>
+
+    {% elif posts %}
     <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
       {% for post in posts %}
-      <article class="group card p-6 flex flex-col js-reveal" style="transition:border-color .3s;">
-        <div class="mb-3">
+      <article class="group card p-6 flex flex-col js-reveal"
+               style="transition:border-color .3s, transform .3s;"
+               onmouseover="this.style.borderColor='var(--primary)';this.style.transform='translateY(-4px)'"
+               onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+
+        <div class="flex items-center justify-between mb-4">
+          {% if post.category %}
           <span class="font-body text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full"
                 style="background:rgba(201,146,42,0.1); color:var(--primary);">{{ post.category }}</span>
+          {% else %}
+          <span class="font-body text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full"
+                style="background:rgba(110,77,153,0.1); color:#9b7abf;">Celestial Insights</span>
+          {% endif %}
+          <span class="font-body text-xs" style="color:var(--muted);">{{ post.date }}</span>
         </div>
+
         <h2 class="mb-3 font-display text-xl font-bold leading-snug group-hover:text-[#d4ac55] transition-colors"
-            style="color:var(--fg);">
-          <a href="/blog/{{ post.id }}">{{ post.title }}</a>
-        </h2>
+            style="color:var(--fg);">{{ post.title }}</h2>
+
         <p class="mb-5 font-body text-sm leading-relaxed flex-1" style="color:var(--muted);">{{ post.excerpt }}</p>
-        <div class="flex items-center justify-between mt-auto pt-4" style="border-top:1px solid var(--border);">
-          <span class="font-body text-xs" style="color:var(--muted);">{{ post.createdAt }}</span>
-          <a href="/blog/{{ post.id }}"
-             class="font-body text-xs font-medium transition-colors hover:text-[#d4ac55]"
-             style="color:var(--primary);">Read More →</a>
+
+        <div class="mt-auto pt-4 flex items-center justify-between" style="border-top:1px solid var(--border);">
+          <span class="font-body text-xs" style="color:var(--muted);">celestialgoodness.com</span>
+          <a href="{{ post.link }}" target="_blank" rel="noopener"
+             class="font-body text-xs font-semibold uppercase tracking-widest transition-colors hover:opacity-80"
+             style="color:var(--primary);">Read Full Post ↗</a>
         </div>
       </article>
       {% endfor %}
     </div>
+
+    <div class="mt-16 text-center js-reveal">
+      <p class="font-body text-sm mb-4" style="color:var(--muted);">
+        Showing {{ posts|length }} most recent posts from Heather's blog.
+      </p>
+      <a href="{{ blog_url }}" target="_blank" rel="noopener" class="btn-gold px-8 py-3">
+        Read All Posts on celestialgoodness.com ↗
+      </a>
+    </div>
+
     {% else %}
     <div class="text-center py-20 js-reveal">
-      <div class="text-5xl mb-4">✦</div>
+      <div class="text-5xl mb-4" style="color:var(--primary)">✦</div>
       <p class="font-display text-2xl font-bold mb-2" style="color:var(--fg);">New writings are coming.</p>
-      <p class="font-body text-base" style="color:var(--muted);">Heather is preparing her first celestial insights. Check back soon.</p>
+      <p class="font-body text-sm mb-8" style="color:var(--muted);">
+        Heather is preparing her celestial insights. In the meantime, visit her blog directly.
+      </p>
+      <a href="{{ blog_url }}" target="_blank" rel="noopener" class="btn-gold px-8 py-3">
+        Visit celestialgoodness.com ↗
+      </a>
     </div>
     {% endif %}
+
   </div>
 </section>
 
-<!-- CTA -->
+<!-- BOOK CTA -->
 <section class="py-16 text-center" style="border-top:1px solid var(--border); background:rgba(19,22,43,0.3);">
   <div class="max-w-lg mx-auto px-4 js-reveal">
     <p class="font-display text-2xl font-bold mb-4" style="color:var(--fg);">Ready for a private reading?</p>
-    <p class="font-body text-sm mb-6" style="color:var(--muted);">Words can illuminate — a session goes deeper. Book your sacred one-on-one with Heather.</p>
+    <p class="font-body text-sm mb-6" style="color:var(--muted);">
+      Words can illuminate — a session goes deeper. Book your sacred one-on-one with Heather.
+    </p>
     <a href="/booking" class="btn-gold px-8 py-3">Book Your Private Reading</a>
   </div>
 </section>

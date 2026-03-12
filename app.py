@@ -348,7 +348,73 @@ def contact():
 def ethics():
     return render_template("ethics.html")
 
-@app.route("/admin")
+
+@app.route("/blog")
+def blog():
+    """
+    Fetch recent posts from Heather's WordPress blog at celestialgoodness.com
+    via its RSS feed. Falls back to an empty list if the feed is unreachable.
+    """
+    import urllib.request
+    import xml.etree.ElementTree as ET
+    from email.utils import parsedate_to_datetime
+
+    BLOG_URL  = "https://celestialgoodness.com"
+    FEED_URL  = f"{BLOG_URL}/feed/"
+    posts     = []
+    feed_error = False
+
+    try:
+        req = urllib.request.Request(
+            FEED_URL,
+            headers={"User-Agent": "CelestialGoodnessBot/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            raw = resp.read()
+
+        root = ET.fromstring(raw)
+        ns   = {"content": "http://purl.org/rss/1.0/modules/content/",
+                "dc":      "http://purl.org/dc/elements/1.1/"}
+
+        for item in root.findall(".//item")[:9]:   # latest 9 posts
+            title    = item.findtext("title", "").strip()
+            link     = item.findtext("link",  "").strip()
+            pub_date = item.findtext("pubDate", "")
+            excerpt  = item.findtext("description", "").strip()
+            category = item.findtext("category", "").strip()
+
+            # Strip HTML tags from excerpt
+            import re as _re
+            excerpt = _re.sub(r"<[^>]+>", "", excerpt)[:200].strip()
+            if len(excerpt) == 200:
+                excerpt += "…"
+
+            # Format date nicely
+            try:
+                dt        = parsedate_to_datetime(pub_date)
+                pretty_dt = dt.strftime("%B %-d, %Y")
+            except Exception:
+                pretty_dt = pub_date[:16]
+
+            posts.append({
+                "title":    title,
+                "link":     link,
+                "date":     pretty_dt,
+                "excerpt":  excerpt,
+                "category": category,
+            })
+
+    except Exception as e:
+        feed_error = True
+        app.logger.warning("Could not fetch blog feed: %s", e)
+
+    return render_template("blog.html",
+                           posts=posts,
+                           blog_url="https://celestialgoodness.com",
+                           feed_error=feed_error)
+
+
+
 def admin_login():
     return render_template("admin_login.html")
 
