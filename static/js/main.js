@@ -136,9 +136,8 @@ const api = {
 
 
 /* ── Animated Star Field (canvas) ──────────────────────────────────────────
-   Stars are fixed in the sky and only twinkle (fade in/out at their own pace).
-   A very slow right-to-left parallax scroll gives the feel of gazing at a
-   moving night sky — no upward drift, no flames, just stars.
+   Stars fly toward the viewer — warp/hyperspace effect.
+   Each star starts tiny near the centre and grows outward, creating depth.
    ─────────────────────────────────────────────────────────────────────────── */
 (function initStarField() {
   document.querySelectorAll('.star-field').forEach(section => {
@@ -147,59 +146,81 @@ const api = {
     section.insertBefore(canvas, section.firstChild);
     const ctx = canvas.getContext('2d');
     let stars = [], raf;
+    let W, H, CX, CY;
 
-    /* Each star has:
-       ox/oy  — original spawn position (used with scrollX offset)
-       r      — radius (tiny, 0.3–1.5 px)
-       base   — base opacity it oscillates around
-       amp    — how much the twinkle deviates from base
-       phase  — current position in the twinkle sine wave
-       speed  — twinkle speed (radians per frame)
-       color  — rgba prefix string                                         */
     function makeStar() {
-      const base = Math.random() * 0.5 + 0.2;   // 0.2 – 0.7
+      // Start at a random angle from centre, very close in
+      const angle = Math.random() * Math.PI * 2;
+      const dist  = Math.random() * 80 + 5;   // start close to centre
       return {
-        ox:    Math.random() * canvas.width  * 2, // spawn across 2× width so field wraps
-        oy:    Math.random() * canvas.height,
-        r:     Math.random() * 1.2 + 0.3,
-        base,
-        amp:   Math.random() * 0.3 + 0.1,         // twinkle depth
-        phase: Math.random() * Math.PI * 2,        // random start in cycle
-        speed: Math.random() * 0.02  + 0.008,      // twinkle speed (radians/frame)
+        angle,
+        dist,
+        speed: Math.random() * 1.8 + 0.6,     // how fast it flies outward
+        r:     Math.random() * 1.0 + 0.2,      // base radius
         color: Math.random() < 0.65
-          ? 'rgba(255,248,200,'   // near-white warm
-          : 'rgba(210,160,60,',   // antique gold
+          ? 'rgba(255,248,200,'
+          : 'rgba(210,160,60,',
+        phase: Math.random() * Math.PI * 2,
+        twinkleSpeed: Math.random() * 0.03 + 0.01,
       };
     }
 
     function resize() {
-      canvas.width  = section.offsetWidth;
-      canvas.height = section.offsetHeight;
-      // ~1 star per 700 px² — enough to feel dense but not cluttered
-      const count = Math.max(60, Math.floor((canvas.width * canvas.height) / 700));
-      stars = Array.from({ length: count }, makeStar);
+      canvas.width  = W = section.offsetWidth;
+      canvas.height = H = section.offsetHeight;
+      CX = W / 2;
+      CY = H / 2;
+      const count = Math.max(80, Math.floor((W * H) / 600));
+      // Spread initial distances so they don't all start at centre
+      stars = Array.from({ length: count }, (_, i) => {
+        const s = makeStar();
+        s.dist = Math.random() * Math.hypot(CX, CY); // scattered start
+        return s;
+      });
     }
 
-    // scrollX advances 0.015 px per frame — imperceptibly slow rightward drift
-    let scrollX = 0;
-
     function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      scrollX += 0.4;                               // ~24 px/sec at 60fps
+      ctx.clearRect(0, 0, W, H);
 
       stars.forEach(s => {
-        // Advance twinkle phase
-        s.phase += s.speed;
+        s.dist  += s.speed;
+        s.phase += s.twinkleSpeed;
 
-        // Smooth sine-wave opacity — never flickers harshly
-        const opacity = s.base + s.amp * Math.sin(s.phase);
+        // Reset star when it flies off screen
+        const maxDist = Math.hypot(CX, CY) + 20;
+        if (s.dist > maxDist) {
+          s.dist  = Math.random() * 30 + 2;
+          s.angle = Math.random() * Math.PI * 2;
+          s.speed = Math.random() * 1.8 + 0.6;
+        }
 
-        // Screen x wraps so the field tiles seamlessly
-        const sx = (s.ox - scrollX) % canvas.width;
-        const x  = sx < 0 ? sx + canvas.width : sx;
+        const x = CX + Math.cos(s.angle) * s.dist;
+        const y = CY + Math.sin(s.angle) * s.dist;
+
+        // Star grows as it gets farther from centre — simulates flying toward you
+        const progress = s.dist / Math.hypot(CX, CY);
+        const radius   = s.r * (0.3 + progress * 1.8);
+        const opacity  = Math.min(1, progress * 1.5) *
+                         (0.5 + 0.4 * Math.sin(s.phase));
+
+        // Draw a short streak behind the star for warp feel
+        if (progress > 0.15) {
+          const tailLen = Math.min(progress * 8, 12);
+          const tx = x - Math.cos(s.angle) * tailLen;
+          const ty = y - Math.sin(s.angle) * tailLen;
+          const grad = ctx.createLinearGradient(tx, ty, x, y);
+          grad.addColorStop(0, s.color + '0)');
+          grad.addColorStop(1, s.color + (opacity * 0.6).toFixed(3) + ')');
+          ctx.beginPath();
+          ctx.moveTo(tx, ty);
+          ctx.lineTo(x, y);
+          ctx.strokeStyle = grad;
+          ctx.lineWidth   = radius * 0.8;
+          ctx.stroke();
+        }
 
         ctx.beginPath();
-        ctx.arc(x, s.oy, s.r, 0, Math.PI * 2);
+        ctx.arc(x, y, Math.max(0.3, radius), 0, Math.PI * 2);
         ctx.fillStyle = s.color + opacity.toFixed(3) + ')';
         ctx.fill();
       });
@@ -207,24 +228,16 @@ const api = {
       raf = requestAnimationFrame(draw);
     }
 
-    // Pause animation when section is off-screen
     const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        if (!raf) draw();
-      } else {
-        cancelAnimationFrame(raf);
-        raf = null;
-      }
+      if (entries[0].isIntersecting) { if (!raf) draw(); }
+      else { cancelAnimationFrame(raf); raf = null; }
     }, { threshold: 0 });
 
     observer.observe(section);
-
     resize();
     window.addEventListener('resize', () => {
-      cancelAnimationFrame(raf);
-      raf = null;
-      resize();
-      draw();
+      cancelAnimationFrame(raf); raf = null;
+      resize(); draw();
     });
   });
 })();
