@@ -11,22 +11,23 @@
 <section class="bg-gradient-hero star-field pb-24 pt-32">
   <div class="max-w-6xl mx-auto px-4 text-center">
     <span class="mb-3 inline-block font-body text-xs font-semibold uppercase tracking-[.3em]" style="color:var(--primary)">About Heather</span>
-    <h1 class="font-display text-5xl font-bold" style="color:var(--fg)">Astrologer. Tarot Reader.<br>Modern Mystic.</h1>
+    <h1 class="font-display text-4xl md:text-5xl font-bold" style="color:var(--fg)">Astrologer. Tarot Reader.<br>Modern Mystic.</h1>
     <p class="mt-4 font-body text-base max-w-2xl mx-auto" style="color:var(--muted)">Over three decades of astrological study. Nearly two decades with tarot. A lifelong devotion to the sacred.</p>
   </div>
 </section>
 
 <!-- PHOTO + OPENING BIO -->
-<section class="py-24">
+<section class="py-16 md:py-24">
   <div class="max-w-5xl mx-auto px-4">
-    <div class="grid gap-16 md:grid-cols-[1fr_2fr] items-start">
+    <div class="flex flex-col md:grid md:grid-cols-[1fr_2fr] gap-10 md:gap-16 items-start">
 
-      <!-- Heather's photo -->
-      <div class="sticky top-28">
-        <div class="rounded-2xl overflow-hidden aspect-[3/4] js-reveal" style="border:1px solid var(--border);">
+      <!-- Photo — stacks on top on mobile, sticky on desktop -->
+      <div class="w-full md:sticky md:top-28">
+        <div class="rounded-2xl overflow-hidden js-reveal mx-auto" style="border:1px solid var(--border); max-width:340px;">
           <img src="{{ url_for('static', filename='images/heather-cafe.jpeg') }}"
                alt="Heather Wiggins — Celestial Goodness Astrologer & Tarot Reader"
-               class="w-full h-full object-cover object-top" />
+               class="w-full object-cover object-top"
+               style="max-height:420px;" />
         </div>
         <div class="mt-6 text-center">
           <a href="/booking" class="btn-gold px-8 py-3">Book a Reading</a>
@@ -85,18 +86,42 @@
         </p>
         <p class="font-display text-lg" style="color:var(--fg)">Thank you. 🌙</p>
       </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PHOTO GALLERY -->
+<section class="py-12 md:py-16" style="background:var(--bg); border-top:1px solid var(--border);">
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 js-reveal">
+      <div class="rounded-2xl overflow-hidden" style="border:1px solid var(--border); aspect-ratio:3/4;">
+        <img src="{{ url_for('static', filename='images/heather-hero.jpeg') }}"
+             alt="Heather Wiggins — Celestial Goodness"
+             class="w-full h-full object-cover object-top" />
+      </div>
+      <div class="rounded-2xl overflow-hidden" style="border:1px solid var(--border); aspect-ratio:3/4;">
+        <img src="{{ url_for('static', filename='images/heather-beach.jpeg') }}"
+             alt="Heather Wiggins at sunset"
+             class="w-full h-full object-cover object-top" />
+      </div>
+      <div class="rounded-2xl overflow-hidden" style="border:1px solid var(--border); aspect-ratio:3/4;">
+        <img src="{{ url_for('static', filename='images/heather-garden.jpeg') }}"
+             alt="Heather Wiggins — Celestial Goodness"
+             class="w-full h-full object-cover object-center" />
+      </div>
     </div>
   </div>
 </section>
 
 <!-- PILLARS -->
-<section class="py-24" style="border-top:1px solid var(--border); background:rgba(19,22,43,0.3);">
+<section class="py-16 md:py-24" style="border-top:1px solid var(--border); background:rgba(19,22,43,0.3);">
   <div class="max-w-6xl mx-auto px-4">
     <div class="mb-12 text-center js-reveal">
       <span class="mb-3 inline-block font-body text-xs font-semibold uppercase tracking-[.3em]" style="color:var(--primary)">The Work</span>
-      <h2 class="font-display text-4xl font-bold" style="color:var(--fg)">What Guides Each Session</h2>
+      <h2 class="font-display text-3xl md:text-4xl font-bold" style="color:var(--fg)">What Guides Each Session</h2>
     </div>
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {% for v in [
         {'icon':'🌙','title':'Ancient Wisdom','desc':'Over three decades studying the sacred systems of astrology, mythology, symbolism, and the archetypal patterns that shape human experience.'},
         {'icon':'✦','title':'Intuitive Clarity','desc':'Sessions that speak to clarity without anxiety, deep insight without despair, and direction that honors your own free will and inner knowing.'},
@@ -113,36 +138,15 @@
   </div>
 </section>
 
-<!-- CTA -->
-<section class="py-24 text-center">
+<!-- ORACLE QUOTE -->
+<section class="py-16 text-center" style="border-top:1px solid var(--border);">
   <div class="max-w-2xl mx-auto px-4 js-reveal">
-    <div class="text-4xl mb-4">✦</div>
-<!-- Photo Gallery -->
-<section class="py-16" style="background:var(--bg)">
-  <div class="max-w-5xl mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 js-reveal">
-      <div class="rounded-2xl overflow-hidden aspect-[3/4]" style="border:1px solid var(--border)">
-        <img src="{{ url_for('static', filename='images/heather-hero.jpeg') }}"
-             alt="Heather Wiggins — Celestial Goodness"
-             class="w-full h-full object-cover object-top" />
-      </div>
-      <div class="rounded-2xl overflow-hidden aspect-[3/4]" style="border:1px solid var(--border)">
-        <img src="{{ url_for('static', filename='images/heather-beach.jpeg') }}"
-             alt="Heather Wiggins at sunset"
-             class="w-full h-full object-cover object-top" />
-      </div>
-      <div class="rounded-2xl overflow-hidden aspect-[3/4]" style="border:1px solid var(--border)">
-        <img src="{{ url_for('static', filename='images/heather-garden.jpeg') }}"
-             alt="Heather Wiggins — Celestial Goodness"
-             class="w-full h-full object-cover object-center" />
-      </div>
-    </div>
-  </div>
-</section>
-
-
-    <p class="font-body text-base leading-relaxed mb-8" style="color:var(--muted)">
-      The Oracle at Delphi said it. Socrates elaborated: <em>"To know thyself is the beginning of wisdom."</em> Your natal chart, your session — these are sacred tools for exactly that.
+    <div class="text-4xl mb-6" style="color:var(--primary)">✦</div>
+    <blockquote class="font-display text-xl md:text-2xl font-bold mb-3" style="color:var(--fg);">
+      "To know thyself is the beginning of wisdom."
+    </blockquote>
+    <p class="font-body text-sm mb-10" style="color:var(--muted)">
+      The Oracle at Delphi said it. Socrates elaborated. Your natal chart, your session — these are sacred tools for exactly that.
     </p>
     <a href="/booking" class="btn-gold px-10 py-4 text-base">Book Your Private Reading</a>
   </div>

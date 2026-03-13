@@ -581,14 +581,43 @@ def submit_testimonial():
 
 @app.route("/api/newsletter", methods=["POST"])
 def newsletter():
+    import urllib.request as _urllib
+    import json as _json
+
     data  = request.get_json() or {}
     email = data.get("email", "").strip()
+
     if not email or not valid_email(email):
         return jsonify({"error": "A valid email address is required."}), 400
-    if Subscriber.query.filter_by(email=email).first():
-        return jsonify({"error": "You're already on the list!"}), 400
-    db.session.add(Subscriber(email=email))
-    db.session.commit()
+
+    # Save to local DB (always, as backup)
+    if not Subscriber.query.filter_by(email=email).first():
+        db.session.add(Subscriber(email=email))
+        db.session.commit()
+
+    # Sync to ConvertKit
+    ck_api_key = os.environ.get("CONVERTKIT_API_KEY", "")
+    ck_form_id = os.environ.get("CONVERTKIT_FORM_ID", "")
+
+    if ck_api_key and ck_form_id:
+        try:
+            payload = _json.dumps({
+                "api_key": ck_api_key,
+                "email":   email,
+            }).encode("utf-8")
+            ck_req = _urllib.Request(
+                f"https://api.convertkit.com/v3/forms/{ck_form_id}/subscribe",
+                data=payload,
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            with _urllib.urlopen(ck_req, timeout=6) as resp:
+                ck_resp = _json.loads(resp.read())
+                app.logger.info("ConvertKit sync: %s", ck_resp.get("subscription", {}).get("state", "unknown"))
+        except Exception as e:
+            # Don't fail the request if ConvertKit is down — local DB is the backup
+            app.logger.warning("ConvertKit sync failed: %s", e)
+
     return jsonify({"success": True}), 200
 
 
