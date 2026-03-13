@@ -707,9 +707,7 @@ def admin_stats():
     }), 200
 
 
-# ─────────────────────────────────────────────
 # Admin — Bookings
-# ─────────────────────────────────────────────
 
 @app.route("/api/admin/bookings")
 def get_bookings():
